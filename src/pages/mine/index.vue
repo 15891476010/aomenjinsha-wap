@@ -43,7 +43,7 @@
         <wd-cell title="关于我们" icon="info-circle" clickable @click="navigateToAbout">
           <wd-icon name="arrow-right" />
         </wd-cell>
-        <wd-cell title="常见问题" icon="help-circle" @click="navigateToFAQ">
+        <wd-cell title="常见问题" icon="help-circle" clickable @click="navigateToFAQ">
           <wd-icon name="arrow-right" />
         </wd-cell>
         <wd-cell title="问题反馈" icon="check-circle" clickable @click="handleQuestionFeedback">
@@ -80,7 +80,7 @@ const navigateToProfile = () => {
 
 // 常见问题
 const navigateToFAQ = () => {
-  uni.navigateTo({ url: "/pages/faq/index" });
+  uni.navigateTo({ url: "/pages/mine/faq/index" });
 };
 // 关于我们
 const navigateToAbout = () => {

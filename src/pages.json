@@ -33,6 +33,12 @@
       }
     },
     {
+      "path": "pages/mine/faq/index",
+      "style": {
+        "navigationBarTitleText": "常见问题"
+      }
+    },
+    {
       "path": "pages/mine/feedback/index",
       "style": {
         "navigationBarTitleText": "问题反馈"
