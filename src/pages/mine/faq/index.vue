@@ -1,6 +1,9 @@
 <template>
   <view class="faq-container">
     <view class="wechat">
+      <view class="tips">
+        <text>长按关注「有来技术」公众号，获取交流群二维码。</text>
+      </view>
       <view class="flex-center">
         <image
           class="w-158px h-158px"
@@ -9,8 +12,13 @@
           mode="aspectFit"
         />
       </view>
-      <view class="tips">
-        <text>长按关注「有来技术」公众号，获取交流群二维码。</text>
+      <view>
+        <text>如果交流群的二维码过期，请加微信(</text>
+        <text :user-select="true" :selectable="true">haoxianrui</text>
+        <text>)并备注「前端」、「后端」或「全栈」以获取最新二维码。</text>
+      </view>
+      <view>
+        <text>为确保交流群质量，防止营销广告人群混入，我们采取了此措施。望各位理解！</text>
       </view>
     </view>
 
@@ -38,7 +46,7 @@
           </a>
           <!-- #endif -->
           <!-- #ifdef MP-WEIXIN -->
-          <text :user-select="true">
+          <text :user-select="true" :selectable="true">
             https://developers.weixin.qq.com/miniprogram/dev/framework/subpackages/basic.html
           </text>
           <!-- #endif -->
@@ -48,7 +56,7 @@
             以下是一个简单示例。以下示例中创建了两个分包，分包a中包含两个页面，分包b中包含一个页面。
           </text>
           <text class="mt-15rpx">
-            请注意，如果想把分包页面中使用的组件也打包到分包中，则需要将组件放入对应的分包目录下，否则组件会被放入主包中。
+            请注意，如果想把分包页面中使用的组件打包到分包中，则需要将组件放入对应的分包目录下，否则组件会被打包到主包中。
           </text>
         </view>
         <view class="mt-15rpx">
