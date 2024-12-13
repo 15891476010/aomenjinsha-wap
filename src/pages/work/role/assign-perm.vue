@@ -34,10 +34,8 @@
 import RoleAPI from "@/api/system/role";
 import MenuAPI from "@/api/system/menu";
 import DaTree from "@/components/da-tree/index.vue";
-import { useMessage } from "wot-design-uni";
-const message = useMessage();
 
-let roleId = ref<number>(null); // 操作的角色ID
+let roleId = ref<number>(); // 操作的角色ID
 const menuPermOptions = ref<OptionType[]>([]); // 所有菜单
 let rootKeys = ref<number[]>([]); // 根节点数组
 const DaTreeRef = ref(); // 树引用
@@ -49,12 +47,10 @@ const showFab = ref(); // 悬浮按钮是否展开
 async function initAssignPerm() {
   // 获取所有的菜单
   menuPermOptions.value = await MenuAPI.getOptions(false);
-  console.log("menuPermOptions.value", menuPermOptions.value);
-  rootKeys.value = menuPermOptions.value.map((item) => item.value);
+  rootKeys.value = menuPermOptions.value.map((item) => item.value as number);
   // 回显角色已拥有的菜单
-  RoleAPI.getRoleMenuIds(roleId.value).then((data) => {
+  RoleAPI.getRoleMenuIds(roleId.value!).then((data) => {
     const checkedMenuIds = data;
-    console.log("checkedMenuIds=", checkedMenuIds);
     if (checkedMenuIds && checkedMenuIds.length > 0) {
       DaTreeRef.value?.setCheckedKeys(checkedMenuIds, true);
     }
@@ -62,12 +58,12 @@ async function initAssignPerm() {
 }
 
 // 展开/收起树节点
-function doExpandTree(keys, expand) {
+function doExpandTree(keys: number[] | string, expand: boolean) {
   DaTreeRef.value?.setExpandedKeys(keys, expand);
   showFab.value = false;
 }
 // 选中/取消树节点
-function doCheckedTree(keys, checked) {
+function doCheckedTree(keys: number[], checked: boolean) {
   DaTreeRef.value?.setCheckedKeys(keys, checked);
   showFab.value = false;
 }
@@ -76,7 +72,7 @@ function doCheckedTree(keys, checked) {
 function handleAssignPermSubmit() {
   if (roleId.value) {
     const checkedMenuIds: number[] = DaTreeRef.value?.getCheckedKeys();
-    RoleAPI.updateRoleMenus(roleId.value, JSON.stringify(checkedMenuIds)).then(() => {
+    RoleAPI.updateRoleMenus(roleId.value, checkedMenuIds).then(() => {
       uni.showToast({ title: "分配权限成功", icon: "success" });
       uni.navigateBack({ delta: 1 });
     });

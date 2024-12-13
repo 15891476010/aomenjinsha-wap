@@ -116,9 +116,9 @@ export interface RolePageVO {
   /** 角色状态 */
   status?: number;
   /** 创建时间 */
-  createTime?: Date;
+  createTime?: string;
   /** 修改时间 */
-  updateTime?: Date;
+  updateTime?: string;
 }
 
 /** 角色表单对象 */
@@ -128,7 +128,7 @@ export interface RoleForm {
   /** 角色编码 */
   code?: string;
   /** 数据权限 */
-  dataScope?: number;
+  dataScope: number;
   /** 角色名称 */
   name?: string;
   /** 排序 */

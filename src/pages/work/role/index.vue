@@ -98,6 +98,7 @@ import RoleAPI, { RolePageVO, RolePageQuery, RoleForm } from "@/api/system/role"
 import { onLoad, onReachBottom } from "@dcloudio/uni-app";
 import { LoadMoreState } from "wot-design-uni/components/wd-loadmore/types";
 import { DropMenuItemExpose } from "wot-design-uni/components/wd-drop-menu-item/types";
+import { FormInstance } from "wot-design-uni/components/wd-form/types";
 import { FormRules } from "wot-design-uni/components/wd-form/types";
 import { useMessage } from "wot-design-uni";
 const message = useMessage();
@@ -198,7 +199,10 @@ const dataScopeOptions = ref<Record<string, any>[]>([
   { label: "本人数据", value: 3 },
 ]);
 
-const formData = reactive<RoleForm>({});
+const formData = reactive<RoleForm>({
+  dataScope: 0,
+  sort: 1,
+});
 
 const rules: FormRules = {
   name: [{ required: true, message: "请输入角色名称", trigger: "blur" }],
@@ -208,14 +212,14 @@ const rules: FormRules = {
   sort: [{ required: true, message: "请输入排序号", trigger: "change" }],
 };
 
-const roleFormRef = ref();
+const roleFormRef = ref<FormInstance>();
 
 /**
  * 打开弹窗
  */
 async function handleOpenDialog(id?: number) {
   dialog.visible = true;
-  formData.id = null;
+  formData.id = undefined;
   formData.name = "";
   formData.code = "";
   formData.dataScope = 0;
@@ -232,26 +236,28 @@ async function handleOpenDialog(id?: number) {
  * 提交保存
  */
 function handleSubmit() {
-  roleFormRef.value.validate().then(({ valid }: { valid: boolean }) => {
-    if (valid) {
-      const roleId = formData.id;
-      if (roleId) {
-        RoleAPI.update(roleId, formData).then(() => {
-          uni.showToast({ title: "修改成功", icon: "success" });
-          dialog.visible = false;
-          queryParams.pageNum = 1;
-          handleQuery();
-        });
-      } else {
-        RoleAPI.add(formData).then(() => {
-          uni.showToast({ title: "添加成功", icon: "success" });
-          dialog.visible = false;
-          queryParams.pageNum = 1;
-          handleQuery();
-        });
+  if (roleFormRef.value) {
+    roleFormRef.value.validate().then(({ valid }) => {
+      if (valid) {
+        const roleId = formData.id;
+        if (roleId) {
+          RoleAPI.update(roleId, formData).then(() => {
+            uni.showToast({ title: "修改成功", icon: "success" });
+            dialog.visible = false;
+            queryParams.pageNum = 1;
+            handleQuery();
+          });
+        } else {
+          RoleAPI.add(formData).then(() => {
+            uni.showToast({ title: "添加成功", icon: "success" });
+            dialog.visible = false;
+            queryParams.pageNum = 1;
+            handleQuery();
+          });
+        }
       }
-    }
-  });
+    });
+  }
 }
 
 /**

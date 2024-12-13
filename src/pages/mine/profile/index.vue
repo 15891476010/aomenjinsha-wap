@@ -91,7 +91,7 @@ function avatarUpload() {
   });
 }
 // 头像裁剪完成
-function handleAvatarConfirm(event) {
+function handleAvatarConfirm(event: any) {
   const { tempFilePath } = event;
   FileAPI.upload(tempFilePath).then((fileInfo: FileInfo) => {
     const avatarForm: UserProfileForm = {
@@ -131,7 +131,7 @@ const handleOpenDialog = () => {
 
 // 提交表单
 function handleSubmit() {
-  userProfileFormRef.value.validate().then(({ valid }) => {
+  userProfileFormRef.value.validate().then(({ valid }: { valid: boolean }) => {
     if (valid) {
       UserAPI.updateProfile(userProfileForm).then(() => {
         uni.showToast({ title: "账号资料修改成功", icon: "none" });
@@ -158,13 +158,13 @@ onBeforeUnmount(() => {
   // #endif
 });
 // 禁用浏览器双指缩放，使头像裁剪时双指缩放能够起作用
-function touchstartListener(event) {
+function touchstartListener(event: TouchEvent) {
   if (event.touches.length > 1) {
     event.preventDefault();
   }
 }
 // 禁用浏览器下拉刷新，使头像裁剪时能够移动图片
-function touchmoveListener(event) {
+function touchmoveListener(event: TouchEvent) {
   event.preventDefault();
 }
 </script>
