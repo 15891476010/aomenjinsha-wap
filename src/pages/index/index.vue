@@ -83,19 +83,7 @@
       </template>
 
       <view class="charts-box">
-        <qiun-data-charts
-          type="line"
-          :chartData="chartData"
-          :opts="{
-            xAxis: {
-              rotateLabel: true, // 启用标签旋转
-              rotateAngle: -45, // 设置旋转角度
-            },
-            yAxis: {
-              disabled: true,
-            },
-          }"
-        />
+        <qiun-data-charts type="area" :chartData="chartData" :opts="chartOpts" />
       </view>
     </wd-card>
   </view>
@@ -105,15 +93,6 @@
 import { dayjs } from "wot-design-uni";
 
 import LogAPI, { VisitStatsVO } from "@/api/system/log";
-
-interface VisitStats {
-  type: string;
-  title: string;
-  icon: string;
-  growthRate: number;
-  granularity: string;
-  todayCount: number;
-}
 
 const current = ref<number>(0);
 
@@ -128,6 +107,28 @@ const visitStatsData = ref<VisitStatsVO>({
 
 // 图表数据
 const chartData = ref({});
+
+const chartOpts = ref({
+  padding: [20, 0, 20, 0],
+  xAxis: {
+    fontSize: 10,
+    rotateLabel: true,
+    rotateAngle: 30,
+  },
+  yAxis: {
+    disabled: true,
+  },
+  extra: {
+    area: {
+      type: "curve",
+      opacity: 0.2,
+      addLine: true,
+      width: 2,
+      gradient: true,
+      activeType: "hollow",
+    },
+  },
+});
 
 // 日期范围
 const recentDaysRange = ref(7);
@@ -192,12 +193,12 @@ const loadVisitTrendData = () => {
       categories: data.dates,
       series: [
         {
-          name: "浏览量(PV)",
-          data: data.pvList,
+          name: "访客数(UV)",
+          data: data.ipList,
         },
         {
-          name: "IP",
-          data: data.ipList,
+          name: "浏览量(PV)",
+          data: data.pvList,
         },
       ],
     };
