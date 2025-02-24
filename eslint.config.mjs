@@ -30,14 +30,7 @@ export default [
         ...globals.node,
         ...autoImportConfig.globals,
         ...{
-          PageQuery: "readonly",
-          PageResult: "readonly",
-          OptionType: "readonly",
-          ResponseData: "readonly",
-          ExcelResult: "readonly",
-          TagView: "readonly",
-          AppSettings: "readonly",
-          __APP_INFO__: "readonly",
+          uni: "readonly", // uni-app 全局对象
         },
       },
     },
