@@ -133,7 +133,7 @@ const chartOpts = ref({
 // 日期范围
 const recentDaysRange = ref(7);
 
-const swiperList = ref(["https://oss.youlai.tech/blog/banner9.png"]);
+const swiperList = ref(["https://www.youlai.tech/storage/blog/banner9.png"]);
 
 // 快捷导航列表
 const navList = reactive([
