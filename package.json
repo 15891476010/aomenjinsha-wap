@@ -1,6 +1,7 @@
 {
   "name": "vue-uniapp-template",
   "version": "0.0.0",
+  "type": "module",
   "scripts": {
     "dev:app": "uni -p app",
     "dev:app-android": "uni -p app-android",
@@ -42,6 +43,7 @@
     "build:quickapp-webview-union": "uni build -p quickapp-webview-union",
     "type-check": "vue-tsc --noEmit",
     "lint:eslint": "eslint --fix  ./src",
+    "lint:prettier": "prettier --write \"**/*.{js,cjs,ts,json,css,scss,vue,html,md}\"",
     "lint:stylelint": "stylelint  \"**/*.{css,scss,vue,html}\" --fix",
     "lint:lint-staged": "lint-staged",
     "prepare": "husky",
