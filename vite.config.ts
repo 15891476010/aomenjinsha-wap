@@ -28,7 +28,7 @@ export default defineConfig(async ({ mode }: ConfigEnv): Promise<UserConfig> => 
         imports: ["vue", "uni-app"],
         dts: "src/types/auto-imports.d.ts", // 自动生成的类型声明文件
         eslintrc: {
-          enabled: true,
+          enabled: false,
         },
       }),
       uni(),
