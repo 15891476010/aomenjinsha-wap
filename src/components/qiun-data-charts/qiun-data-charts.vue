@@ -68,8 +68,8 @@
     <!-- #ifdef MP-ALIPAY -->
     <block v-if="ontouch">
       <canvas
-        :id="cid"
         v-show="showchart"
+        :id="cid"
         :canvasId="cid"
         :width="cWidth * pixel"
         :height="cHeight * pixel"
@@ -846,7 +846,7 @@ export default {
       let cid = this.cid;
       if (this.echarts !== true && cfu.option[cid] && cfu.option[cid].context) {
         const ctx = cfu.option[cid].context;
-        if (typeof ctx === "object" && !!!cfu.option[cid].update) {
+        if (typeof ctx === "object" && !cfu.option[cid].update) {
           ctx.clearRect(0, 0, this.cWidth * this.pixel, this.cHeight * this.pixel);
           ctx.draw();
         }

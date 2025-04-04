@@ -10,18 +10,18 @@ export const isCheckedStatus = 2;
  * @param originData 拷贝对象
  * @author crlang(https://crlang.com)
  */
-export function deepClone(originData) {
+export function deepClone(originData: any): any {
   const type = Object.prototype.toString.call(originData);
-  let data;
+  let data: any;
   if (type === "[object Array]") {
     data = [];
     for (let i = 0; i < originData.length; i++) {
       data.push(deepClone(originData[i]));
     }
   } else if (type === "[object Object]") {
-    data = {};
+    data = {} as Record<string, any>;
     for (const prop in originData) {
-      if (originData.hasOwnProperty(prop)) {
+      if (Object.prototype.hasOwnProperty.call(originData, prop)) {
         // 非继承属性
         data[prop] = deepClone(originData[prop]);
       }
@@ -34,11 +34,13 @@ export function deepClone(originData) {
 
 /**
  * 获取所有指定的节点
- * @param type
- * @param value
+ * @param list 列表
+ * @param type 类型
+ * @param value 值
+ * @param packDisabledkey 是否包含禁用节点
  * @author crlang(https://crlang.com)
  */
-export function getAllNodes(list, type, value, packDisabledkey = true) {
+export function getAllNodes(list: any[], type: string, value: any, packDisabledkey = true): any[] {
   if (!list || list.length === 0) {
     return [];
   }
@@ -58,16 +60,23 @@ export function getAllNodes(list, type, value, packDisabledkey = true) {
 
 /**
  * 获取所有指定的key值
- * @param type
- * @param value
+ * @param list 列表
+ * @param type 类型
+ * @param value 值
+ * @param packDisabledkey 是否包含禁用节点
  * @author crlang(https://crlang.com)
  */
-export function getAllNodeKeys(list, type, value, packDisabledkey = true) {
+export function getAllNodeKeys(
+  list: any[],
+  type: string,
+  value: any,
+  packDisabledkey = true
+): string[] | null {
   if (!list || list.length === 0) {
     return null;
   }
 
-  const res = [];
+  const res: string[] = [];
   for (let i = 0; i < list.length; i++) {
     const item = list[i];
     if (item[type] === value) {
@@ -82,69 +91,63 @@ export function getAllNodeKeys(list, type, value, packDisabledkey = true) {
 
 /**
  * 错误输出
- *
- * @param msg
+ * @param msg 错误消息
+ * @param args 附加参数
  */
-export function logError(msg, ...args) {
+export function logError(msg: string, ...args: any[]): void {
   console.error(`DaTree: ${msg}`, ...args);
 }
 
 const toString = Object.prototype.toString;
 
-export function is(val, type) {
+export function is(val: any, type: string): boolean {
   return toString.call(val) === `[object ${type}]`;
 }
 
 /**
  * 是否对象(Object)
- * @param val
-
+ * @param val 值
  */
-export function isObject(val) {
+export function isObject(val: any): boolean {
   return val !== null && is(val, "Object");
 }
 
 /**
  * 是否数字(Number)
- * @param val
-
+ * @param val 值
  */
-export function isNumber(val) {
+export function isNumber(val: any): boolean {
   return is(val, "Number");
 }
 
 /**
  * 是否字符串(String)
- * @param val
-
+ * @param val 值
  */
-export function isString(val) {
+export function isString(val: any): boolean {
   return is(val, "String");
 }
 
 /**
  * 是否函数方法(Function)
- * @param val
-
+ * @param val 值
  */
-export function isFunction(val) {
+export function isFunction(val: any): boolean {
   return typeof val === "function";
 }
 
 /**
  * 是否布尔(Boolean)
- * @param val
-
+ * @param val 值
  */
-export function isBoolean(val) {
+export function isBoolean(val: any): boolean {
   return is(val, "Boolean");
 }
 
 /**
  * 是否数组(Array)
- * @param val
-
+ * @param val 值
  */
-export function isArray(val) {
+export function isArray(val: any): boolean {
   return val && Array.isArray(val);
 }

@@ -57,7 +57,6 @@
 <script lang="ts" setup>
 import { type LoginFormData } from "@/api/auth";
 import { useUserStore } from "@/store/modules/user";
-import { useDictStore } from "@/store/modules/dict";
 const loginFormRef = ref();
 
 const loginFormData = ref<LoginFormData>({
@@ -66,7 +65,6 @@ const loginFormData = ref<LoginFormData>({
 });
 
 const userStore = useUserStore();
-const dictStore = useDictStore();
 
 // 登录处理
 const handleLogin = () => {
@@ -75,23 +73,14 @@ const handleLogin = () => {
       try {
         await userStore.login(loginFormData.value);
         await userStore.getInfo();
-        await dictStore.loadDictionaries();
         uni.showToast({ title: "登录成功", icon: "success" });
 
         // 检查是否有上一页
-        const pages = getCurrentPages();
-        console.log("pages", pages.length);
-        if (pages.length > 1) {
-          setTimeout(() => {
-            uni.navigateBack();
-          }, 1500);
-        } else {
-          setTimeout(() => {
-            uni.reLaunch({
-              url: "/pages/index/index",
-            });
-          }, 1500);
-        }
+        setTimeout(() => {
+          uni.reLaunch({
+            url: "/pages/index/index",
+          });
+        }, 1500);
       } catch (error: any) {
         console.log("登录失败", error.message);
       }

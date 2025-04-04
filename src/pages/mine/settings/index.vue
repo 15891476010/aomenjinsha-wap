@@ -126,7 +126,7 @@ const handleClearCache = async () => {
       title: "清理成功",
       icon: "success",
     });
-  } catch (error) {
+  } catch {
     uni.showToast({
       title: "清理失败",
       icon: "error",

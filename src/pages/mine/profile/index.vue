@@ -63,12 +63,7 @@
   </view>
 </template>
 <script setup lang="ts">
-import UserAPI, {
-  type UserProfileVO,
-  UserProfileForm,
-  MobileBindingForm,
-  EmailBindingForm,
-} from "@/api/system/user";
+import UserAPI, { type UserProfileVO, UserProfileForm } from "@/api/system/user";
 import FileAPI, { type FileInfo } from "@/api/file";
 
 const originalSrc = ref<string>(""); //选取的原图路径

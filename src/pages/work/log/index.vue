@@ -119,7 +119,7 @@ function loadmore() {
       total.value = data.total;
       queryParams.pageNum++;
     })
-    .catch((e) => {
+    .catch(() => {
       pageData.value = [];
     })
     .finally(() => {

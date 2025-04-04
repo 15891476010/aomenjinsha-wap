@@ -95,7 +95,7 @@ const handleQuestionFeedback = () => {
   uni.navigateTo({ url: "/pages/mine/feedback/index" });
 };
 // 建设中
-const handleItemclick = (item: any) => {
+const handleItemclick = () => {
   toast.show("建设中...");
 };
 </script>

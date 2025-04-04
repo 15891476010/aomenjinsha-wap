@@ -101,7 +101,7 @@ const getNetworkType = async () => {
       ? `${(navigator as any).connection.effectiveType || "未知"}`
       : "不支持";
     // #endif
-  } catch (error) {
+  } catch {
     networkType.value = "获取失败";
     signalStrength.value = "获取失败";
   }
@@ -143,13 +143,13 @@ const startTest = async () => {
   try {
     const startTime = Date.now();
     // #ifdef H5
-    const res = await uni.request({
+    await uni.request({
       url: "/api/v1/auth/captcha",
       timeout: 5000,
     });
     // #endif
     // #ifndef H5
-    const resOther = await request({
+    await request({
       url: "/api/v1/auth/captcha",
       timeout: 5000,
     });
@@ -159,7 +159,7 @@ const startTest = async () => {
 
     pingResult.value.delay = delay;
     pingResult.value.status = delay < 300 ? "正常" : "较慢";
-  } catch (error) {
+  } catch {
     pingResult.value.delay = "--";
     pingResult.value.status = "连接失败";
   } finally {

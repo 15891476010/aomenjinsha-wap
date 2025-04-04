@@ -128,38 +128,23 @@ const formatDate = (date: Date | undefined): string => {
   return date ? date.toString() : "-";
 };
 
-const getLevelType = (level: string | number | undefined): string => {
-  if (!level) return "-";
-  const levelMap: Record<string, string> = {
-    L: "低",
-    M: "中",
-    H: "高",
-  };
-  return levelMap[level] || "未知";
-};
-
 // 加载更多
 const loadMore = async () => {
   if (loadState.value === "loading") return;
 
   loadState.value = "loading";
-  try {
-    const { list, total: totalCount } = await NoticeAPI.getPage(queryParams.value);
+  const { list, total: totalCount } = await NoticeAPI.getPage(queryParams.value);
 
-    if (queryParams.value.pageNum === 1) {
-      dataList.value = list;
-    } else {
-      dataList.value = [...dataList.value, ...list];
-    }
-
-    total.value = totalCount;
-    queryParams.value.pageNum++;
-
-    loadState.value = dataList.value.length >= total.value ? "finished" : "loading";
-  } catch (error) {
-    loadState.value = "error";
-    uni.showToast({ title: "加载失败", icon: "none" });
+  if (queryParams.value.pageNum === 1) {
+    dataList.value = list;
+  } else {
+    dataList.value = [...dataList.value, ...list];
   }
+
+  total.value = totalCount;
+  queryParams.value.pageNum++;
+
+  loadState.value = dataList.value.length >= total.value ? "finished" : "loading";
 };
 
 // 查看详情
@@ -207,7 +192,7 @@ const handleDelete = (notice: NoticePageVO) => {
           queryParams.value.pageNum = 1;
           loadMore();
         } catch (error) {
-          uni.showToast({ title: "删除失败", icon: "none" });
+          uni.showToast({ title: "删除失败" + error, icon: "none" });
         }
       }
     },
@@ -228,7 +213,7 @@ const handlePublish = (notice: NoticePageVO) => {
           queryParams.value.pageNum = 1;
           loadMore();
         } catch (error) {
-          uni.showToast({ title: "发布失败", icon: "none" });
+          uni.showToast({ title: "发布失败" + error, icon: "none" });
         }
       }
     },
@@ -253,7 +238,7 @@ const handleRevoke = (notice: NoticePageVO) => {
           loadMore();
         } catch (error) {
           uni.showToast({
-            title: "撤回失败",
+            title: "撤回失败" + error,
             icon: "error",
           });
         }

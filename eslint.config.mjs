@@ -17,13 +17,24 @@ const autoImportConfig = JSON.parse(fs.readFileSync(".eslintrc-auto-import.json"
 
 /** @type {import('eslint').Linter.Config[]} */
 export default [
-  // 指定检查文件和忽略文件
+  // 忽略指定文件
+  {
+    ignores: [
+      "node_modules/**",
+      "dist/**",
+      "unpackage/**",
+      "public/**",
+      "static/**",
+      "**/u-charts/**",
+      "**/qiun-**/**",
+      "**/auto-imports.d.ts",
+      "src/types/auto-imports.d.ts",
+    ],
+  },
+  // 检查文件的配置
   {
     files: ["**/*.{js,mjs,cjs,ts,vue}"],
     ignores: ["**/*.d.ts"],
-  },
-  // 全局配置
-  {
     languageOptions: {
       globals: {
         ...globals.browser,
@@ -35,6 +46,8 @@ export default [
           ResponseData: "readonly", // 统一响应数据类型
           PageResult: "readonly", // 分页结果数据类型
           PageQuery: "readonly", // 分页查询数据类型
+          OptionType: "readonly", // 选项类型
+          getCurrentPages: "readonly", // uni-app 全局 API
         },
       },
     },
@@ -51,6 +64,8 @@ export default [
           ignoreRestSiblings: true, // 忽略解构赋值中同级未使用变量的警告
         },
       ],
+      "no-prototype-builtins": "off", // 允许直接调用Object.prototype方法
+      "no-constant-binary-expression": "warn", // 将常量二元表达式警告降为警告级别
     },
   },
   // JavaScript 配置
@@ -91,6 +106,24 @@ export default [
       ...pluginVue.configs["vue3-recommended"].rules, // Vue 3 推荐规则
       "vue/no-v-html": "off", // 允许 v-html
       "vue/multi-word-component-names": "off", // 允许单个单词组件名
+    },
+  },
+
+  // 单独针对第三方组件的处理
+  {
+    files: ["**/qiun-data-charts.vue", "**/qiun-data-charts/**/*.vue", "**/u-charts/**"],
+    linterOptions: {
+      noInlineConfig: false,
+      reportUnusedDisableDirectives: false,
+    },
+    rules: {
+      // 禁用所有规则
+      ...Object.fromEntries(
+        Object.keys(pluginVue.configs["vue3-recommended"].rules || {}).map((key) => [key, "off"])
+      ),
+      "no-unused-vars": "off",
+      "no-prototype-builtins": "off",
+      "@typescript-eslint/no-explicit-any": "off",
     },
   },
 ];

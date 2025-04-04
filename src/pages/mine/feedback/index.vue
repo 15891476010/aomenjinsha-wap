@@ -125,7 +125,7 @@ const handleSubmit = async () => {
     setTimeout(() => {
       uni.navigateBack();
     }, 1500);
-  } catch (error) {
+  } catch {
     toast.error("提交失败，请重试");
   } finally {
     submitting.value = false;

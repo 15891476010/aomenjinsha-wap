@@ -683,10 +683,13 @@ export default defineComponent({
           let newChildren = [...(item.originItem?.children || []), ...(apiRes || [])];
           const newChildrenObj = {};
           newChildren = newChildren.reduce((total, next) => {
-            newChildrenObj[next[fieldMap.value]]
-              ? ""
-              : (newChildrenObj[next[fieldMap.value]] = true && total.push(next));
-            return total;
+            if (newChildrenObj[next[fieldMap.value]]) {
+              return total;
+            } else {
+              newChildrenObj[next[fieldMap.value]] = true;
+              total.push(next);
+              return total;
+            }
           }, []);
 
           item.originItem.children = newChildren || null;

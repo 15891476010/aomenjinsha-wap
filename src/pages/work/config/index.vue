@@ -153,7 +153,7 @@ async function submitForm() {
   loading.value = true;
   try {
     if (formRef.value) {
-      formRef.value!.validate().then(async ({ valid, errors }) => {
+      formRef.value!.validate().then(async ({ valid }) => {
         if (valid) {
           if (form.value.id) {
             await ConfigAPI.update(form.value.id, form.value);
@@ -170,7 +170,7 @@ async function submitForm() {
         }
       });
     }
-  } catch (error) {
+  } catch {
     uni.showToast({ title: "操作失败", icon: "error" });
     loading.value = false;
   } finally {
