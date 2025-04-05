@@ -59,8 +59,14 @@
 <script lang="ts" setup>
 import { ref } from "vue";
 import { useToast } from "wot-design-uni";
+import { checkLogin } from "@/utils/auth";
 
 const toast = useToast();
+
+// 检查登录状态
+onLoad(() => {
+  if (!checkLogin()) return;
+});
 
 // 问题类型选项
 const feedbackTypes = [

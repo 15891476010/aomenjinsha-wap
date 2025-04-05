@@ -2,6 +2,7 @@
   <view class="settings-container">
     <wd-cell-group>
       <wd-cell title="账号和安全" icon="secured" is-link @click="navigateToAccount" />
+      <wd-cell title="主题设置" icon="brush" is-link @click="navigateToTheme" />
       <wd-cell title="用户协议" icon="user" is-link @click="navigateToUserAgreement" />
       <wd-cell title="隐私政策" icon="folder" is-link @click="navigateToPrivacy" />
     </wd-cell-group>
@@ -33,6 +34,8 @@
 
 <script lang="ts" setup>
 import { useUserStore } from "@/store/modules/user";
+import { checkLogin } from "@/utils/auth";
+
 const userStore = useUserStore();
 
 const isLogin = computed(() => !!userStore.userInfo);
@@ -49,6 +52,10 @@ const navigateToUserAgreement = () => {
 // 隐私政策
 const navigateToPrivacy = () => {
   uni.navigateTo({ url: "/pages/mine/settings/privacy/index" });
+};
+// 主题设置
+const navigateToTheme = () => {
+  uni.navigateTo({ url: "/pages/mine/settings/theme/index" });
 };
 // 网络测试
 const navigateToNetworkTest = () => {
@@ -145,7 +152,10 @@ const handleLogout = () => {
   });
 };
 
+// 检查登录状态
 onLoad(() => {
+  if (!checkLogin()) return;
+
   getCacheSize();
 });
 </script>

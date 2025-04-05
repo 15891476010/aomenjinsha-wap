@@ -3,6 +3,7 @@ import App from "./App.vue";
 import setupPlugins from "@/plugins";
 
 import "uno.css";
+import "@/styles/global.scss";
 
 import { setupStore } from "@/store";
 

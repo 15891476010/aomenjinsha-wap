@@ -64,11 +64,19 @@ export const useUserStore = defineStore("user", () => {
     }
   };
 
+  // 判断用户信息是否完整
+  const isUserInfoComplete = (): boolean => {
+    if (!userInfo.value) return false;
+
+    return !!(userInfo.value.nickname && userInfo.value.avatar);
+  };
+
   return {
     userInfo,
     login,
     loginByWechat,
     logout,
     getInfo,
+    isUserInfoComplete,
   };
 });

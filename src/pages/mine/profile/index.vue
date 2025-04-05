@@ -65,6 +65,7 @@
 <script setup lang="ts">
 import UserAPI, { type UserProfileVO, UserProfileForm } from "@/api/system/user";
 import FileAPI, { type FileInfo } from "@/api/file";
+import { checkLogin } from "@/utils/auth";
 
 const originalSrc = ref<string>(""); //选取的原图路径
 const avatarShow = ref<boolean>(false); //显示头像裁剪
@@ -137,12 +138,20 @@ function handleSubmit() {
   });
 }
 
-onMounted(() => {
+// 检查登录状态
+onLoad(() => {
+  if (!checkLogin()) return;
+
   // #ifdef H5
   document.addEventListener("touchstart", touchstartListener, { passive: false });
   document.addEventListener("touchmove", touchmoveListener, { passive: false });
   // #endif
   loadUserProfile();
+});
+
+onMounted(() => {
+  // 在onMounted中不再重复检查登录状态和加载用户信息
+  // 如果需要检查登录状态和加载用户信息，请使用onLoad中的逻辑
 });
 
 // 页面销毁前移除事件监听
