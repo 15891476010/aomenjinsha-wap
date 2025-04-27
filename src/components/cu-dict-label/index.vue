@@ -19,31 +19,44 @@ const props = defineProps({
     default: false,
   },
 });
-type TagType = "success" | "warning" | "primary" | "danger" | "default";
+
 const label = ref("");
-const tagType = ref<TagType>();
+const tagType = ref<string | undefined>();
 
 const getLabelAndTagByValue = async (dictCode: string, value: any) => {
-  // 先从本地缓存中获取字典数据
-  const dictData = dictStore.getDictionary(dictCode);
-  console.log("dictData", dictData);
+  // 按需加载字典数据
+  await dictStore.loadDictItems(dictCode);
+
+  // 从缓存中获取字典数据
+  const dictItems = dictStore.getDictItems(dictCode);
+
   // 查找对应的字典项
-  const dictEntry = dictData.find((item: any) => item.value == value);
+  const dictItem = dictItems.find((item) => item.value == value);
+
   return {
-    label: dictEntry ? dictEntry.label : "",
-    tag: dictEntry ? dictEntry.tagType : undefined,
+    label: dictItem?.label || "",
+    tagType: dictItem?.tagType,
   };
 };
 
+// 监听字典数据变化，确保WebSocket更新时刷新标签
+watch(
+  () => props.code && dictStore.getDictItems(props.code),
+  async () => {
+    if (props.code) {
+      await fetchLabelAndTag();
+    }
+  },
+  { deep: true }
+);
+
 // 监听 props 的变化，获取并更新 label 和 tag
 const fetchLabelAndTag = async () => {
-  const result = await getLabelAndTagByValue(props.code as string, props.modelValue);
-  console.log("result", result);
+  if (!props.code || props.modelValue === undefined) return;
+
+  const result = await getLabelAndTagByValue(props.code, props.modelValue);
   label.value = result.label;
-  if (result.tag === "info") {
-    result.tag = "default";
-  }
-  tagType.value = result.tag as "success" | "warning" | "primary" | "danger" | "default";
+  tagType.value = result.tagType;
 };
 
 // 首次挂载时获取字典数据

@@ -292,11 +292,14 @@ export interface DictItemForm {
  */
 export interface DictItemOption {
   /** 字典数据值 */
-  value: string;
+  value: string | number;
 
   /** 字典数据标签 */
   label: string;
 
   /** 标签类型 */
-  tagType: string;
+  tagType?: "" | "success" | "info" | "warning" | "danger" | "primary";
+
+  /** 允许其他属性 */
+  [key: string]: any;
 }

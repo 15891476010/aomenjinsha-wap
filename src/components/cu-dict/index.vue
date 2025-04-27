@@ -114,13 +114,28 @@ function handleChange(val: any) {
 
 // 获取字典数据
 onMounted(async () => {
-  if (!props.type) {
+  if (!props.code) {
     return;
   }
-  let dictData = dictStore.getDictionary(props.code);
-  options.value = dictData.map((item) => ({
+  // 按需加载字典数据
+  await dictStore.loadDictItems(props.code);
+  options.value = dictStore.getDictItems(props.code).map((item) => ({
     label: item.label,
     value: item.value,
   }));
 });
+
+// 监听字典数据变化，确保WebSocket更新时刷新选项
+watch(
+  () => dictStore.getDictItems(props.code),
+  (newItems) => {
+    if (newItems.length > 0) {
+      options.value = newItems.map((item) => ({
+        label: item.label,
+        value: item.value,
+      }));
+    }
+  },
+  { deep: true }
+);
 </script>
