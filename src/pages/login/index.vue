@@ -35,11 +35,17 @@
             <input
               v-model="loginFormData.password"
               class="form-input"
-              type="password"
+              :type="showPassword ? 'text' : 'password'"
               placeholder="请输入密码"
               placeholder-style="color: #9ca3af; font-weight: normal;"
             />
-            <wd-icon name="eye-close" size="18" color="#9ca3af" class="eye-icon" />
+            <wd-icon
+              :name="showPassword ? 'eye-open' : 'eye-close'"
+              size="18"
+              color="#9ca3af"
+              class="eye-icon"
+              @click="showPassword = !showPassword"
+            />
           </view>
           <view class="divider"></view>
 
@@ -94,6 +100,7 @@ const loginFormRef = ref();
 const toast = useToast();
 const loading = ref(false);
 const userStore = useUserStore();
+const showPassword = ref(false);
 
 // 登录表单数据
 const loginFormData = ref<LoginFormData>({

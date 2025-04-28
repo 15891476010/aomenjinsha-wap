@@ -11,8 +11,8 @@
             placeholder="请输入关键字"
           />
           <view class="flex-between py-2">
-            <wd-button custom-class="w-20per" type="info" @click="handleResetQuery">重置</wd-button>
-            <wd-button custom-class="w-70per" @click="handleQuery">确定</wd-button>
+            <wd-button custom-class="w-20%" type="info" @click="handleResetQuery">重置</wd-button>
+            <wd-button custom-class="w-70%" @click="handleQuery">确定</wd-button>
           </view>
         </view>
       </wd-drop-menu-item>

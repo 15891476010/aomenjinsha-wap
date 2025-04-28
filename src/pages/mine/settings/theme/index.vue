@@ -54,8 +54,9 @@
 </template>
 
 <script lang="ts" setup>
-import { onLoad } from "@dcloudio/uni-app";
+import { onLoad, onShow } from "@dcloudio/uni-app";
 import { useThemeStore } from "@/store";
+import { applyThemeOnPageShow } from "@/utils/theme";
 
 const themeStore = useThemeStore();
 
@@ -137,6 +138,22 @@ const saveThemeSettings = () => {
 onLoad(() => {
   // 初始化自定义颜色输入框
   customColor.value = themeStore.primaryColor;
+});
+
+// 页面显示时重新应用主题（解决小程序环境问题）
+onShow(() => {
+  // 在小程序环境中，页面显示时重新应用主题
+  if (typeof document === "undefined") {
+    applyThemeOnPageShow(themeStore.primaryColor);
+
+    // 为了确保样式应用，我们可以在页面中设置内联样式
+    // 这样可以绕过小程序的CSS变量限制
+    const pages = getCurrentPages();
+    const currentPage = pages[pages.length - 1];
+    if (currentPage) {
+      console.log("当前页面重新应用主题色");
+    }
+  }
 });
 </script>
 
@@ -245,30 +262,30 @@ onLoad(() => {
         display: flex;
         align-items: center;
         justify-content: center;
+      }
 
-        .preview-button {
-          width: 200rpx;
-          height: 80rpx;
-          font-size: 28rpx;
-          line-height: 80rpx;
-          color: #fff;
-          text-align: center;
-          border-radius: 8rpx;
-        }
+      .preview-button {
+        width: 100%;
+        height: 80rpx;
+        line-height: 80rpx;
+        color: #fff;
+        text-align: center;
+        border-radius: 8rpx;
+      }
 
-        .preview-text {
-          font-size: 32rpx;
-          font-weight: bold;
-        }
+      .preview-text {
+        font-size: 32rpx;
+        font-weight: 500;
+      }
 
-        .preview-border {
-          width: 200rpx;
-          height: 80rpx;
-          line-height: 80rpx;
-          text-align: center;
-          border: 2px solid;
-          border-radius: 8rpx;
-        }
+      .preview-border {
+        width: 100%;
+        height: 80rpx;
+        line-height: 80rpx;
+        text-align: center;
+        background-color: #f5f5f5;
+        border: 2px solid;
+        border-radius: 8rpx;
       }
     }
   }
@@ -276,10 +293,9 @@ onLoad(() => {
   .reset-btn {
     width: 100%;
     height: 80rpx;
-    margin-bottom: 30rpx;
     font-size: 28rpx;
     line-height: 80rpx;
-    color: #666;
+    color: #333;
     background-color: #f5f5f5;
     border: none;
     border-radius: 8rpx;

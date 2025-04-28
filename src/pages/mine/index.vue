@@ -10,9 +10,6 @@
             :src="isLogin ? userInfo!.avatar : defaultAvatar"
             mode="aspectFill"
           />
-          <view v-if="isLogin" class="avatar-edit">
-            <wd-icon name="edit-pen" size="16" color="#fff" />
-          </view>
         </view>
         <view class="user-details">
           <block v-if="isLogin">
@@ -21,7 +18,12 @@
           </block>
           <block v-else>
             <view class="login-prompt">立即登录获取更多功能</view>
-            <wd-button class="login-btn" size="small" type="primary" @click="navigateToLoginPage">
+            <wd-button
+              custom-class="btn-login"
+              size="small"
+              type="primary"
+              @click="navigateToLoginPage"
+            >
               登录/注册
             </wd-button>
           </block>
@@ -31,7 +33,7 @@
             <wd-icon name="setting1" size="22" color="#333" />
           </view>
           <view v-if="isLogin" class="action-btn" @click="navigateToSection('messages')">
-            <wd-icon name="message" size="22" color="#333" />
+            <wd-icon name="notification" size="22" color="#333" />
             <view v-if="true" class="badge">2</view>
           </view>
         </view>
@@ -56,53 +58,6 @@
       </view>
     </view>
 
-    <!-- 我的订单 -->
-    <view class="card-container">
-      <view class="card-header">
-        <view class="card-title">
-          <wd-icon name="cart" size="18" :color="themeStore.primaryColor" />
-          <text>我的订单</text>
-        </view>
-        <view class="card-action" @click="navigateToSection('orders')">
-          <text>全部订单</text>
-          <wd-icon name="arrow-right" size="14" color="#999" />
-        </view>
-      </view>
-      <view class="order-status">
-        <view class="status-item" @click="navigateToSection('orders', 'pending')">
-          <view class="status-icon">
-            <wd-icon name="wallet-pay" size="28" :color="themeStore.primaryColor" />
-            <view v-if="true" class="status-badge">2</view>
-          </view>
-          <view class="status-label">待付款</view>
-        </view>
-        <view class="status-item" @click="navigateToSection('orders', 'shipping')">
-          <view class="status-icon">
-            <wd-icon name="shopping" size="28" :color="themeStore.primaryColor" />
-          </view>
-          <view class="status-label">待发货</view>
-        </view>
-        <view class="status-item" @click="navigateToSection('orders', 'receiving')">
-          <view class="status-icon">
-            <wd-icon name="car" size="28" :color="themeStore.primaryColor" />
-          </view>
-          <view class="status-label">待收货</view>
-        </view>
-        <view class="status-item" @click="navigateToSection('orders', 'comment')">
-          <view class="status-icon">
-            <wd-icon name="comment-o" size="28" :color="themeStore.primaryColor" />
-          </view>
-          <view class="status-label">待评价</view>
-        </view>
-        <view class="status-item" @click="navigateToSection('orders', 'after-sale')">
-          <view class="status-icon">
-            <wd-icon name="service" size="28" :color="themeStore.primaryColor" />
-          </view>
-          <view class="status-label">售后</view>
-        </view>
-      </view>
-    </view>
-
     <!-- 常用工具 -->
     <view class="card-container">
       <view class="card-header">
@@ -114,22 +69,11 @@
       <view class="tools-grid">
         <view class="tool-item" @click="navigateToProfile">
           <view class="tool-icon">
-            <wd-icon name="person" size="24" :color="themeStore.primaryColor" />
+            <wd-icon name="user" size="24" :color="themeStore.primaryColor" />
           </view>
           <view class="tool-label">个人资料</view>
         </view>
-        <view class="tool-item" @click="navigateToSection('address')">
-          <view class="tool-icon">
-            <wd-icon name="location" size="24" :color="themeStore.primaryColor" />
-          </view>
-          <view class="tool-label">收货地址</view>
-        </view>
-        <view class="tool-item" @click="navigateToSection('todos')">
-          <view class="tool-icon">
-            <wd-icon name="task" size="24" :color="themeStore.primaryColor" />
-          </view>
-          <view class="tool-label">待办事项</view>
-        </view>
+
         <view class="tool-item" @click="navigateToFAQ">
           <view class="tool-icon">
             <wd-icon name="help-circle" size="24" :color="themeStore.primaryColor" />
@@ -148,18 +92,6 @@
           </view>
           <view class="tool-label">关于我们</view>
         </view>
-        <view class="tool-item" @click="navigateToSettings">
-          <view class="tool-icon">
-            <wd-icon name="setting1" size="24" :color="themeStore.primaryColor" />
-          </view>
-          <view class="tool-label">设置</view>
-        </view>
-        <view class="tool-item" @click="navigateToSection('wallet')">
-          <view class="tool-icon">
-            <wd-icon name="wallet" size="24" :color="themeStore.primaryColor" />
-          </view>
-          <view class="tool-label">我的钱包</view>
-        </view>
       </view>
     </view>
 
@@ -174,8 +106,8 @@
       <view class="services-list">
         <view class="service-item" @click="navigateToSection('services', 'vip')">
           <view class="service-left">
-            <view class="service-icon vip-icon">
-              <wd-icon name="crown" size="22" color="#FFD700" />
+            <view class="service-icon">
+              <wd-icon name="dong" size="22" :color="themeStore.primaryColor" />
             </view>
             <view class="service-info">
               <view class="service-name">会员中心</view>
@@ -187,7 +119,7 @@
         <view class="service-item" @click="navigateToSection('services', 'coupon')">
           <view class="service-left">
             <view class="service-icon">
-              <wd-icon name="ticket" size="22" :color="themeStore.primaryColor" />
+              <wd-icon name="discount" size="22" :color="themeStore.primaryColor" />
             </view>
             <view class="service-info">
               <view class="service-name">优惠券</view>
@@ -212,7 +144,7 @@
     </view>
 
     <view v-if="isLogin" class="logout-btn-container">
-      <wd-button class="logout-btn" @click="handleLogout">退出登录</wd-button>
+      <wd-button custom-class="logout-btn-unocss" @click="handleLogout">退出登录</wd-button>
     </view>
 
     <wd-toast />
@@ -314,6 +246,7 @@ const navigateToSection = (section: string, subSection?: string) => {
 </script>
 
 <style lang="scss" scoped>
+/* stylelint-disable declaration-property-value-no-unknown */
 .mine-container {
   min-height: 100vh;
   padding-bottom: 100rpx;
@@ -352,20 +285,6 @@ const navigateToSection = (section: string, subSection?: string) => {
         border-radius: 50%;
         box-shadow: 0 6rpx 16rpx rgba(0, 0, 0, 0.1);
       }
-
-      .avatar-edit {
-        position: absolute;
-        right: 0;
-        bottom: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 36rpx;
-        height: 36rpx;
-        background-color: var(--primary-color);
-        border-radius: 50%;
-        box-shadow: 0 2rpx 6rpx rgba(0, 0, 0, 0.2);
-      }
     }
 
     .user-details {
@@ -388,16 +307,6 @@ const navigateToSection = (section: string, subSection?: string) => {
         margin-bottom: 16rpx;
         font-size: 28rpx;
         color: #fff;
-      }
-
-      .login-btn {
-        width: 160rpx;
-        height: 60rpx;
-        font-size: 26rpx;
-        color: var(--primary-color);
-        background-color: #fff;
-        border: none;
-        border-radius: 30rpx;
       }
     }
 
@@ -617,10 +526,6 @@ const navigateToSection = (section: string, subSection?: string) => {
         height: 70rpx;
         background-color: rgba(var(--primary-color-rgb), 0.08);
         border-radius: 16rpx;
-
-        &.vip-icon {
-          background: linear-gradient(135deg, #ffd700, #ffa500);
-        }
       }
 
       .service-info {
@@ -645,19 +550,33 @@ const navigateToSection = (section: string, subSection?: string) => {
 // 退出登录按钮
 .logout-btn-container {
   margin: 60rpx 30rpx;
+}
+</style>
 
-  .logout-btn {
-    width: 100%;
-    height: 80rpx;
-    font-size: 28rpx;
-    color: #666;
-    background-color: #f5f5f5;
-    border: none;
-    border-radius: 40rpx;
+<style>
+/* 使用全局样式解决微信小程序组件样式问题 */
+.logout-btn-unocss {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  height: 80rpx !important;
+  font-size: 32rpx !important;
+  font-weight: bold !important;
+  color: #fff !important;
+  background-color: var(--primary-color) !important;
+  border: 2rpx solid var(--primary-color) !important;
+  border-radius: 40rpx !important;
+  box-shadow: 0 4rpx 12rpx rgba(var(--primary-color-rgb), 0.3) !important;
+}
 
-    &:active {
-      opacity: 0.8;
-    }
-  }
+.btn-login {
+  width: 160rpx !important;
+  height: 60rpx !important;
+  font-size: 26rpx !important;
+  color: var(--primary-color) !important;
+  background-color: #fff !important;
+  border: none !important;
+  border-radius: 30rpx !important;
 }
 </style>

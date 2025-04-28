@@ -1,10 +1,12 @@
 <template>
   <view class="settings-container">
     <wd-cell-group>
+      <wd-cell title="个人资料" icon="user" is-link @click="navigateToProfile" />
       <wd-cell title="账号和安全" icon="secured" is-link @click="navigateToAccount" />
-      <wd-cell title="主题设置" icon="brush" is-link @click="navigateToTheme" />
+      <wd-cell title="主题设置" icon="setting1" is-link @click="navigateToTheme" />
       <wd-cell title="用户协议" icon="user" is-link @click="navigateToUserAgreement" />
       <wd-cell title="隐私政策" icon="folder" is-link @click="navigateToPrivacy" />
+      <wd-cell title="关于我们" icon="info" is-link @click="navigateToAbout" />
     </wd-cell-group>
 
     <wd-cell-group custom-style="margin-top:40rpx">
@@ -18,9 +20,9 @@
       />
     </wd-cell-group>
 
-    <wd-cell-group v-if="isLogin" custom-style="margin-top:40rpx">
-      <wd-cell title="退出" icon="logout" is-link @click="handleLogout" />
-    </wd-cell-group>
+    <view v-if="isLogin" class="logout-section">
+      <wd-button class="logout-btn" @click="handleLogout">退出登录</wd-button>
+    </view>
 
     <!-- 全屏 loading -->
     <view v-if="clearing" class="loading-mask">
@@ -35,28 +37,57 @@
 <script lang="ts" setup>
 import { useUserStore } from "@/store/modules/user";
 import { checkLogin } from "@/utils/auth";
+import { computed, ref } from "vue";
 
 const userStore = useUserStore();
-
 const isLogin = computed(() => !!userStore.userInfo);
+
+// 个人资料
+const navigateToProfile = () => {
+  if (checkLogin()) {
+    uni.navigateTo({
+      url: "/pages/mine/profile/index",
+    });
+  }
+};
 
 // 账号和安全
 const navigateToAccount = () => {
-  uni.navigateTo({ url: "/pages/mine/settings/account/index" });
+  if (checkLogin()) {
+    uni.navigateTo({
+      url: "/pages/mine/settings/account/index",
+    });
+  }
+};
+
+// 主题设置
+const navigateToTheme = () => {
+  uni.navigateTo({
+    url: "/pages/mine/settings/theme/index",
+  });
 };
 
 // 用户协议
 const navigateToUserAgreement = () => {
-  uni.navigateTo({ url: "/pages/mine/settings/agreement/index" });
+  uni.navigateTo({
+    url: "/pages/mine/agreements/user-agreement",
+  });
 };
+
 // 隐私政策
 const navigateToPrivacy = () => {
-  uni.navigateTo({ url: "/pages/mine/settings/privacy/index" });
+  uni.navigateTo({
+    url: "/pages/mine/agreements/privacy-policy",
+  });
 };
-// 主题设置
-const navigateToTheme = () => {
-  uni.navigateTo({ url: "/pages/mine/settings/theme/index" });
+
+// 关于我们
+const navigateToAbout = () => {
+  uni.navigateTo({
+    url: "/pages/mine/about/index",
+  });
 };
+
 // 网络测试
 const navigateToNetworkTest = () => {
   uni.navigateTo({ url: "/pages/mine/settings/network/index" });
@@ -145,10 +176,18 @@ const handleClearCache = async () => {
 
 // 退出登录
 const handleLogout = () => {
-  userStore.logout().then(() => {
-    uni.showToast({ title: "已退出登录", icon: "success" });
-    // 跳转到登录页
-    uni.reLaunch({ url: "/pages/mine/index" });
+  uni.showModal({
+    title: "提示",
+    content: "确定要退出登录吗？",
+    success: function (res) {
+      if (res.confirm) {
+        userStore.logout();
+        uni.showToast({
+          title: "已退出登录",
+          icon: "success",
+        });
+      }
+    },
   });
 };
 
@@ -161,6 +200,7 @@ onLoad(() => {
 </script>
 <style lang="scss" scoped>
 .settings-container {
+  min-height: 100vh;
   padding: 20px;
 
   .loading-mask {
@@ -197,6 +237,34 @@ onLoad(() => {
         font-weight: 500;
         color: #333;
       }
+    }
+  }
+
+  .logout-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 20rpx;
+    margin-top: 60rpx;
+  }
+
+  .logout-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 90rpx;
+    font-size: 32rpx;
+    font-weight: 500;
+    color: #fff;
+    background-color: var(--primary-color);
+    border: none;
+    border-radius: 45rpx;
+    box-shadow: 0 4rpx 12rpx rgba(var(--primary-color-rgb), 0.3);
+    transition: opacity 0.2s;
+
+    &:active {
+      opacity: 0.85;
     }
   }
 }
