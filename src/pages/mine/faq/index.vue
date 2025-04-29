@@ -8,7 +8,7 @@
         <image
           class="w-158px h-158px"
           :show-menu-by-longpress="true"
-          src="/static/images/youlai-mp-qr-code.png"
+          src="/static/images/qrcode-official.png"
           mode="aspectFit"
         />
       </view>

@@ -1,7 +1,7 @@
 <template>
   <view class="login-container">
     <!-- 背景图 -->
-    <image src="/static/images/auth/login-bg.svg" mode="aspectFill" class="login-bg" />
+    <image src="/static/images/login-bg.svg" mode="aspectFill" class="login-bg" />
 
     <!-- Logo和标题区域 -->
     <view class="header">
