@@ -4,7 +4,7 @@
 
 ## 项目截图
 
-![](https://www.youlai.tech/storage/blog/vue-uniapp-template.jpg)
+![](https://www.youlai.tech/storage/blog/2025/04/30/app.jpg)
 
 ## 项目文档
 
