@@ -1,4 +1,8 @@
 import { useUserStore } from "@/store/modules/user";
+import { decrypt, encrypt } from "@/utils/AESUtil";
+
+// 前端全局缓存的信息
+const INDEX_DATA_KEY = "INDEX_DATA_KEY";
 
 /**
  * 检查用户登录状态，未登录则跳转到登录页面
@@ -19,4 +23,12 @@ export function checkLogin(): boolean {
   }
 
   return true;
+}
+
+export function setIndexData(data: any) {
+  uni.setStorageSync(INDEX_DATA_KEY, encrypt(data));
+}
+
+export function getIndexData() {
+  return decrypt(uni.getStorageSync(INDEX_DATA_KEY)) || null;
 }

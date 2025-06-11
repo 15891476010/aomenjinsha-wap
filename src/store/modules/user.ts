@@ -1,3 +1,4 @@
+import { ref } from "vue";
 import { defineStore } from "pinia";
 import AuthAPI, { type LoginFormData } from "@/api/auth";
 import UserAPI, { type UserInfo } from "@/api/system/user";

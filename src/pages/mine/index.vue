@@ -1,25 +1,29 @@
 <template>
   <view class="mine-container">
-    <!-- 用户信息卡片 -->
-    <view class="user-profile">
-      <view class="blur-bg"></view>
+    <!-- 顶部渐变背景和光斑 -->
+    <view class="background-blur"></view>
+    <view class="background-spot spot1"></view>
+    <view class="background-spot spot2"></view>
+    <!-- 用户信息卡片玻璃拟态 -->
+    <view class="user-profile glass-card">
       <view class="user-info">
         <view class="avatar-container" @click="navigateToProfile">
           <image
-            class="avatar"
-            :src="isLogin ? userInfo!.avatar : defaultAvatar"
+            class="avatar avatar-glow"
+            :src="isLogin ? indexData.imagePrefix + userInfo!.avatar : defaultAvatar"
             mode="aspectFill"
           />
+          <view v-if="isLogin" class="vip-badge">VIP{{ userInfo!.vipLevel }}</view>
         </view>
         <view class="user-details">
           <block v-if="isLogin">
-            <view class="nickname">{{ userInfo!.nickname || "匿名用户" }}</view>
+            <view class="nickname">{{ userInfo!.nickName || "匿名用户" }}</view>
             <view class="user-id">ID: {{ userInfo?.username || "0000000" }}</view>
           </block>
           <block v-else>
             <view class="login-prompt">立即登录获取更多功能</view>
             <wd-button
-              custom-class="btn-login"
+              custom-class="btn-login glass-btn"
               size="small"
               type="primary"
               @click="navigateToLoginPage"
@@ -29,10 +33,10 @@
           </block>
         </view>
         <view class="actions">
-          <view class="action-btn" @click="navigateToSettings">
+          <view class="action-btn glass-card" @click="navigateToSettings">
             <wd-icon name="setting1" size="22" color="#333" />
           </view>
-          <view v-if="isLogin" class="action-btn" @click="navigateToSection('messages')">
+          <view v-if="isLogin" class="action-btn glass-card" @click="navigateToSection('messages')">
             <wd-icon name="notification" size="22" color="#333" />
             <view v-if="true" class="badge">2</view>
           </view>
@@ -43,18 +47,12 @@
     <!-- 数据统计 -->
     <view class="stats-container">
       <view class="stat-item" @click="navigateToSection('wallet')">
-        <view class="stat-value">0.00</view>
+        <view class="stat-value">{{ userInfo?.balance }}</view>
         <view class="stat-label">我的余额</view>
       </view>
-      <view class="divider"></view>
-      <view class="stat-item" @click="navigateToSection('favorites')">
-        <view class="stat-value">0</view>
-        <view class="stat-label">我的收藏</view>
-      </view>
-      <view class="divider"></view>
-      <view class="stat-item" @click="navigateToSection('history')">
-        <view class="stat-value">0</view>
-        <view class="stat-label">浏览历史</view>
+      <view class="stat-item" @click="navigateToSection('wallet')">
+        <view class="stat-value">{{ userInfo!.betAmount }}</view>
+        <view class="stat-label">下注金额</view>
       </view>
     </view>
 
@@ -148,14 +146,19 @@
     </view>
 
     <wd-toast />
+    <TabbarCom />
   </view>
 </template>
 
 <script lang="ts" setup>
+import TabbarCom from "@/components/Tabbar";
 import { useToast } from "wot-design-uni";
 import { useUserStore } from "@/store/modules/user";
 import { useThemeStore } from "@/store/modules/theme";
 import { computed } from "vue";
+
+import { getIndexData } from "@/utils/auth";
+const indexData = ref(getIndexData());
 
 const toast = useToast();
 const userStore = useUserStore();
@@ -550,6 +553,82 @@ const navigateToSection = (section: string, subSection?: string) => {
 // 退出登录按钮
 .logout-btn-container {
   margin: 60rpx 30rpx;
+}
+
+.mine-container {
+  position: relative;
+  min-height: 100vh;
+  padding-bottom: 100rpx;
+  overflow: hidden;
+  background: linear-gradient(135deg, #6a85f1 0%, #b8e994 100%);
+}
+.background-blur {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 0;
+  width: 100vw;
+  height: 320rpx;
+  background: linear-gradient(120deg, rgba(106, 133, 241, 0.7) 0%, rgba(184, 233, 148, 0.5) 100%);
+  filter: blur(32rpx);
+}
+.background-spot {
+  position: absolute;
+  z-index: 0;
+  filter: blur(48rpx);
+  border-radius: 50%;
+  opacity: 0.5;
+}
+.spot1 {
+  top: 60rpx;
+  left: 10vw;
+  width: 180rpx;
+  height: 180rpx;
+  background: #b8e994;
+}
+.spot2 {
+  top: 120rpx;
+  right: 8vw;
+  width: 220rpx;
+  height: 220rpx;
+  background: #6a85f1;
+}
+// 玻璃卡片
+.glass-card {
+  background: rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(16px);
+  border: 1rpx solid rgba(255, 255, 255, 0.24);
+  border-radius: 24rpx;
+  box-shadow: 0 8rpx 32rpx 0 rgba(31, 38, 135, 0.18);
+}
+// 玻璃按钮
+.glass-btn {
+  background: rgba(255, 255, 255, 0.22) !important;
+  backdrop-filter: blur(8px) !important;
+  border: 1rpx solid rgba(255, 255, 255, 0.32) !important;
+  box-shadow: 0 2rpx 8rpx rgba(106, 133, 241, 0.08) !important;
+  transition: transform 0.2s;
+  &:active {
+    transform: scale(0.96);
+  }
+}
+// 头像发光
+.avatar-glow {
+  border: 4rpx solid rgba(255, 255, 255, 0.7);
+  box-shadow: 0 0 32rpx 8rpx rgba(106, 133, 241, 0.5);
+}
+// VIP徽章
+.vip-badge {
+  position: absolute;
+  right: -24rpx;
+  bottom: 0;
+  padding: 4rpx 18rpx;
+  font-size: 22rpx;
+  font-weight: bold;
+  color: #fff;
+  background: linear-gradient(90deg, #ffd700 0%, #ffb300 100%);
+  border-radius: 24rpx;
+  box-shadow: 0 2rpx 8rpx rgba(255, 215, 0, 0.18);
 }
 </style>
 

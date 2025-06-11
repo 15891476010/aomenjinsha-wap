@@ -73,7 +73,7 @@ const userProfile = ref<UserProfileVO>(); //用户信息
 
 /** 加载用户信息 */
 const loadUserProfile = async () => {
-  userProfile.value = await UserAPI.getProfile();
+  userProfile.value = await UserAPI.getUserInfo();
 };
 
 // 头像选择

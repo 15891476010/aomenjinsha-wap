@@ -1,5 +1,6 @@
 const TOKEN_KEY = "app-token";
 const USER_INFO_KEY = "user-info";
+import { decrypt, encrypt } from "@/utils/AESUtil";
 
 // 设置 token
 export function setToken(token: string) {
@@ -18,12 +19,12 @@ export function clearToken() {
 
 // 设置用户信息
 export function setUserInfo(userInfo: any) {
-  uni.setStorageSync(USER_INFO_KEY, userInfo);
+  uni.setStorageSync(USER_INFO_KEY, encrypt(userInfo));
 }
 
 // 获取用户信息
 export function getUserInfo(): any {
-  return uni.getStorageSync(USER_INFO_KEY) || null;
+  return decrypt(uni.getStorageSync(USER_INFO_KEY)) || null;
 }
 
 // 清除用户信息

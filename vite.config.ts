@@ -1,6 +1,8 @@
 import { defineConfig, type UserConfig, type ConfigEnv, loadEnv } from "vite";
 import uni from "@dcloudio/vite-plugin-uni";
 import AutoImport from "unplugin-auto-import/vite";
+import Components from "@uni-helper/vite-plugin-uni-components";
+import { WotResolver } from "@uni-helper/vite-plugin-uni-components/resolvers";
 
 export default defineConfig(async ({ mode }: ConfigEnv): Promise<UserConfig> => {
   const UnoCss = await import("unocss/vite").then((i) => i.default);
@@ -23,7 +25,10 @@ export default defineConfig(async ({ mode }: ConfigEnv): Promise<UserConfig> => 
     plugins: [
       // https://github.com/unocss/unocss
       UnoCss(),
-
+      Components({
+        resolvers: [WotResolver()],
+        dts: "src/types/auto-imports.d.ts", // 自动生成的类型声明文件
+      }),
       AutoImport({
         imports: ["vue", "uni-app"],
         dts: "src/types/auto-imports.d.ts", // 自动生成的类型声明文件

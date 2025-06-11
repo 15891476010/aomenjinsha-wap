@@ -1,13 +1,12 @@
 <template>
   <view class="login-container">
-    <!-- 背景图 -->
-    <image src="/static/images/login-bg.svg" mode="aspectFill" class="login-bg" />
+    <!-- 使用渐变背景代替背景图，与注册页面保持一致 -->
 
     <!-- Logo和标题区域 -->
     <view class="header">
-      <image src="/static/logo.png" class="logo" />
-      <text class="title">有来开源</text>
-      <text class="subtitle">专注于构建高效开发的应用解决方案</text>
+      <image :src="indexData.imagePrefix + indexData.logo" class="logo" mode="aspectFit" />
+      <text class="title">{{ indexData.title }}</text>
+      <text v-if="indexData.titles" class="subtitle">{{ indexData.titles }}</text>
     </view>
 
     <!-- 登录表单区域 -->
@@ -54,27 +53,11 @@
             class="login-btn"
             :disabled="loading"
             :style="loading ? 'opacity: 0.7;' : ''"
-            @click="handleLogin"
+            @click="openNameDialog"
           >
             登录
           </button>
         </wd-form>
-
-        <!-- 微信登录 -->
-        <view class="other-login">
-          <view class="other-login-title">
-            <view class="line"></view>
-            <text class="text">其他登录方式</text>
-            <view class="line"></view>
-          </view>
-
-          <view class="wechat-login" @click="handleWechatLogin">
-            <view class="wechat-icon-wrapper">
-              <image src="/static/icons/weixin.png" class="wechat-icon" />
-            </view>
-          </view>
-        </view>
-
         <!-- 底部协议 -->
         <view class="agreement">
           <text class="text">登录即同意</text>
@@ -82,8 +65,23 @@
           <text class="text">和</text>
           <text class="link" @click="navigateToPrivacy">《隐私政策》</text>
         </view>
+
+        <!-- 注册链接 -->
+        <view class="register-link">
+          <text class="text">没有账号？</text>
+          <text class="link" @click="goToRegister">立即注册</text>
+        </view>
       </view>
     </view>
+
+    <wd-message-box selector="wd-message-box-slot">
+      <wd-input v-model="loginFormData.realName" type="text" placeholder="请输入真实姓名" />
+      <wd-input v-model="loginFormData.captchaCode" type="text" placeholder="请输入验证码">
+        <template #suffix>
+          <wd-img :width="100" :height="50" :src="joy" @click="getCaptcha" />
+        </template>
+      </wd-input>
+    </wd-message-box>
 
     <wd-toast />
   </view>
@@ -91,21 +89,26 @@
 
 <script lang="ts" setup>
 import { onLoad } from "@dcloudio/uni-app";
-import { type LoginFormData } from "@/api/auth";
+import AuthAPI, { type LoginFormData } from "@/api/auth";
 import { useUserStore } from "@/store/modules/user";
-import { useToast } from "wot-design-uni";
+import { useToast, useMessage } from "wot-design-uni";
 import { ref } from "vue";
+
+import { getIndexData } from "@/utils/auth";
+const indexData = ref(getIndexData());
 
 const loginFormRef = ref();
 const toast = useToast();
+const message = useMessage("wd-message-box-slot");
 const loading = ref(false);
 const userStore = useUserStore();
 const showPassword = ref(false);
+const joy = ref("https://picsum.photos/200/300");
 
 // 登录表单数据
 const loginFormData = ref<LoginFormData>({
-  username: "admin",
-  password: "123456",
+  username: "",
+  password: "",
 });
 
 // 获取重定向参数
@@ -117,6 +120,27 @@ onLoad((options) => {
     redirect.value = "/pages/index/index";
   }
 });
+
+const openNameDialog = async () => {
+  await getCaptcha();
+  message
+    .confirm({
+      title: "真实姓名验证",
+    })
+    .then(() => {
+      handleLogin();
+    });
+};
+
+/**
+ * 获取验证码
+ */
+const getCaptcha = async () => {
+  // 发送验证码请求
+  const res = await AuthAPI.getCaptcha();
+  joy.value = res.captchaBase64;
+  loginFormData.value.captchaKey = res.captchaKey;
+};
 
 // 登录处理
 const handleLogin = () => {
@@ -130,21 +154,11 @@ const handleLogin = () => {
       toast.success("登录成功");
 
       // 检查用户信息是否完整
-      if (!userStore.isUserInfoComplete()) {
-        // 信息不完整，跳转到完善信息页面
-        setTimeout(() => {
-          uni.navigateTo({
-            url: `/pages/login/complete-profile?redirect=${encodeURIComponent(redirect.value)}`,
-          });
-        }, 1000);
-      } else {
-        // 否则直接跳转到重定向页面
-        setTimeout(() => {
-          uni.reLaunch({
-            url: redirect.value,
-          });
-        }, 1000);
-      }
+      setTimeout(() => {
+        uni.reLaunch({
+          url: redirect.value,
+        });
+      }, 1000);
     })
     .catch((error) => {
       toast.error(error?.message || "登录失败");
@@ -152,55 +166,6 @@ const handleLogin = () => {
     .finally(() => {
       loading.value = false;
     });
-};
-
-// 微信登录处理
-const handleWechatLogin = async () => {
-  if (loading.value) return;
-  loading.value = true;
-
-  try {
-    // #ifdef MP-WEIXIN
-    // 获取微信登录的临时 code
-    const { code } = await uni.login({
-      provider: "weixin",
-    });
-
-    // 调用后端接口进行登录认证
-    const result = await userStore.loginByWechat(code);
-
-    if (result) {
-      // 获取用户信息
-      await userStore.getInfo();
-      toast.success("登录成功");
-
-      // 检查用户信息是否完整
-      if (!userStore.isUserInfoComplete()) {
-        // 如果信息不完整，跳转到完善信息页面
-        setTimeout(() => {
-          uni.navigateTo({
-            url: `/pages/login/complete-profile?redirect=${encodeURIComponent(redirect.value)}`,
-          });
-        }, 1000);
-      } else {
-        // 否则直接跳转到重定向页面
-        setTimeout(() => {
-          uni.reLaunch({
-            url: redirect.value,
-          });
-        }, 1000);
-      }
-    }
-    // #endif
-
-    // #ifndef MP-WEIXIN
-    toast.error("当前环境不支持微信登录");
-    // #endif
-  } catch (error: any) {
-    toast.error(error?.message || "微信登录失败");
-  } finally {
-    loading.value = false;
-  }
 };
 
 // 跳转到用户协议页面
@@ -216,6 +181,13 @@ const navigateToPrivacy = () => {
     url: "/pages/mine/privacy/index",
   });
 };
+
+// 跳转到注册页面
+const goToRegister = () => {
+  uni.navigateTo({
+    url: "/pages/register/index",
+  });
+};
 </script>
 
 <style lang="scss" scoped>
@@ -226,14 +198,11 @@ const navigateToPrivacy = () => {
   align-items: center;
   height: 100vh;
   overflow: hidden;
+  background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
 }
 
 .login-bg {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  display: none; /* 隐藏原背景图 */
 }
 
 .header {
@@ -241,13 +210,13 @@ const navigateToPrivacy = () => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: 120rpx;
+  margin-top: 50rpx;
 }
 
 .logo {
-  width: 140rpx;
-  height: 140rpx;
-  margin-bottom: 20rpx;
+  width: 140px;
+  height: 140px;
+  margin-bottom: 5px;
 }
 
 .title {
@@ -358,7 +327,6 @@ const navigateToPrivacy = () => {
   justify-content: center;
   margin-bottom: 30rpx;
 }
-
 .wechat-icon-wrapper {
   display: flex;
   align-items: center;
@@ -388,6 +356,22 @@ const navigateToPrivacy = () => {
 }
 
 .agreement .link {
+  color: #165dff;
+}
+
+.register-link {
+  display: flex;
+  justify-content: center;
+  margin-top: 20rpx;
+  font-size: 24rpx;
+}
+
+.register-link .text {
+  padding: 0 4rpx;
+  color: #9ca3af;
+}
+
+.register-link .link {
   color: #165dff;
 }
 </style>

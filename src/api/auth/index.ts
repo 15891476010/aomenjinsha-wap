@@ -2,6 +2,26 @@ import request from "@/utils/request";
 
 const AuthAPI = {
   /**
+   * 获取验证码
+   */
+  getCaptcha(): Promise<{ img: string; code: string }> {
+    return request({
+      url: "/api/v1/auth/captcha",
+      method: "GET",
+    });
+  },
+
+  /**
+   * 用户注册
+   */
+  register(data: any): Promise<void> {
+    return request({
+      url: "/api/v1/user/register",
+      method: "POST",
+      data: data,
+    });
+  },
+  /**
    * 登录接口
    *
    * @param username 用户名
@@ -11,12 +31,9 @@ const AuthAPI = {
   login(data: LoginFormData): Promise<LoginResult> {
     console.log("data", data);
     return request<LoginResult>({
-      url: "/api/v1/auth/login",
+      url: "/api/v1/user/login",
       method: "POST",
       data: data,
-      header: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
     });
   },
 
