@@ -9,7 +9,7 @@
 </template>
 
 <script setup lang="ts">
-import { watch } from "vue";
+import { watch, onMounted, ref } from "vue";
 
 // 定义props
 const props = defineProps({
@@ -31,16 +31,50 @@ const props = defineProps({
   },
 });
 
+// 内部状态，用于强制更新
+const forceUpdate = ref(0);
+
 // 监听显示状态变化，便于调试
 watch(
   () => props.show,
   (newVal) => {
     console.log("Loading component visibility changed:", newVal);
+    console.log("Loading component customIcon:", props.customIcon);
+
+    // 强制触发视图更新
+    if (newVal) {
+      forceUpdate.value++;
+      setTimeout(() => {
+        console.log("Loading component should be visible now");
+        console.log("Current customIcon:", props.customIcon);
+        forceUpdate.value++; // 再次更新以确保渲染
+      }, 100);
+    }
   }
 );
+
+// 监听图标变化
+watch(
+  () => props.customIcon,
+  (newVal) => {
+    console.log("Loading component customIcon changed:", newVal);
+    forceUpdate.value++; // 强制更新
+  }
+);
+
+onMounted(() => {
+  console.log("CustomLoading component mounted");
+  console.log("Initial props:", {
+    show: props.show,
+    title: props.title,
+    customIcon: props.customIcon,
+    mask: props.mask,
+  });
+});
 </script>
 
-<style scoped>
+<style>
+/* 全局样式，确保在所有平台上都能正确显示 */
 .custom-loading-mask {
   position: fixed;
   top: 0;
@@ -51,7 +85,6 @@ watch(
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 10px solid red;
 }
 
 .mask {
@@ -64,13 +97,15 @@ watch(
   align-items: center;
   min-width: 200rpx;
   min-height: 200rpx;
-  background: (0, 0, 0, 0.7);
+  padding: 30rpx;
+  background-color: rgba(0, 0, 0, 0.7);
   border-radius: 10rpx;
 }
 
 .custom-icon {
   width: 80rpx;
   height: 80rpx;
+  animation: spin 1s linear infinite; /* 添加旋转动画 */
 }
 
 .default-icon {

@@ -1,52 +1,76 @@
 <template>
   <view class="login-container">
-    <!-- 使用渐变背景代替背景图，与注册页面保持一致 -->
-
+    <NavBarCom v-if="topNav" style="z-index: 9999" :top-nav="topNav" :is-index="true" />
+    <view style="width: 100%; height: 50rpx" />
     <!-- Logo和标题区域 -->
     <view class="header">
       <image :src="indexData.imagePrefix + indexData.logo" class="logo" mode="aspectFit" />
-      <text class="title">{{ indexData.title }}</text>
-      <text v-if="indexData.titles" class="subtitle">{{ indexData.titles }}</text>
+      <text class="website">{{ indexData.title }}</text>
     </view>
 
     <!-- 登录表单区域 -->
     <view class="login-card">
-      <view class="form-wrap">
+      <view class="tab-header">
+        <view class="tab-item" :class="{ active: !showRegister }" @click="showRegister = false">
+          会员登入
+        </view>
+        <view class="tab-item" :class="{ active: showRegister }" @click="showRegister = true">
+          注册账号
+        </view>
+      </view>
+      <!-- 登录表单 -->
+      <view v-if="!showRegister" class="form-wrap">
         <wd-form ref="loginFormRef" :model="loginFormData">
           <!-- 用户名输入框 -->
           <view class="form-item">
-            <wd-icon name="user" size="22" color="#165DFF" class="input-icon" />
-            <input v-model="loginFormData.username" class="form-input" placeholder="请输入用户名" />
-            <wd-icon
-              v-if="loginFormData.username"
-              name="close-fill"
-              size="18"
-              color="#9ca3af"
-              class="clear-icon"
-              @click="loginFormData.username = ''"
+            <view class="input-icon-wrapper">
+              <wd-icon name="user" size="22" color="#666" class="input-icon" />
+            </view>
+            <input
+              v-model="loginFormData.username"
+              class="form-input"
+              placeholder="账号"
+              placeholder-style="color: #999;"
             />
+            <view
+              v-if="loginFormData.username"
+              class="eye-icon-wrapper"
+              @click="loginFormData.username = ''"
+            >
+              <wd-icon name="close-fill" size="18" color="#999" />
+            </view>
           </view>
-          <view class="divider"></view>
 
           <!-- 密码输入框 -->
           <view class="form-item">
-            <wd-icon name="lock-on" size="22" color="#165DFF" class="input-icon" />
+            <view class="input-icon-wrapper">
+              <wd-icon name="lock-on" size="22" color="#666" class="input-icon" />
+            </view>
             <input
               v-model="loginFormData.password"
               class="form-input"
               :type="showPassword ? 'text' : 'password'"
-              placeholder="请输入密码"
-              placeholder-style="color: #9ca3af; font-weight: normal;"
+              placeholder="密码"
+              placeholder-style="color: #999;"
             />
-            <wd-icon
-              :name="showPassword ? 'eye-open' : 'eye-close'"
-              size="18"
-              color="#9ca3af"
-              class="eye-icon"
-              @click="showPassword = !showPassword"
-            />
+            <view class="eye-icon-wrapper" @click="showPassword = !showPassword">
+              <wd-icon :name="showPassword ? 'eye-open' : 'eye-close'" size="18" color="#999" />
+            </view>
           </view>
-          <view class="divider"></view>
+
+          <!-- 记住账号 & 忘记密码 -->
+          <view class="account-options">
+            <view class="remember-account">
+              <checkbox
+                :checked="rememberAccount"
+                color="#2979ff"
+                style="transform: scale(0.7)"
+                @click="rememberAccount = !rememberAccount"
+              />
+              <text>储存账号</text>
+            </view>
+            <text class="forgot-password" @click="handleForgotPassword">忘记密码?</text>
+          </view>
 
           <!-- 登录按钮 -->
           <button
@@ -55,23 +79,40 @@
             :style="loading ? 'opacity: 0.7;' : ''"
             @click="openNameDialog"
           >
-            登录
+            登入
           </button>
         </wd-form>
-        <!-- 底部协议 -->
-        <view class="agreement">
-          <text class="text">登录即同意</text>
-          <text class="link" @click="navigateToUserAgreement">《用户协议》</text>
-          <text class="text">和</text>
-          <text class="link" @click="navigateToPrivacy">《隐私政策》</text>
-        </view>
 
-        <!-- 注册链接 -->
-        <view class="register-link">
-          <text class="text">没有账号？</text>
-          <text class="link" @click="goToRegister">立即注册</text>
+        <!-- 底部下载区域 -->
+        <view class="download-area">
+          <view class="download-btn" @click="downloadApp">
+            <text>原生app下载</text>
+          </view>
+          <!-- <view class="download-btn" @click="openBrowser">
+            <text>赛手浏览器</text>
+          </view> -->
         </view>
       </view>
+
+      <!-- 注册表单 -->
+      <view v-else class="form-wrap">
+        <register-form
+          @register-success="handleRegisterSuccess"
+          @switch-to-login="showRegister = false"
+        />
+      </view>
+    </view>
+
+    <!-- 底部链接 -->
+    <view class="bottom-links">
+      <view class="link-item" @click="justBrowse">
+        <wd-icon name="link" size="18" color="#fff" />
+        <text>随便逛逛</text>
+      </view>
+      <!-- <view class="link-item" @click="goToDesktop">
+        <wd-icon name="computer" size="18" color="#fff" />
+        <text>去电脑版</text>
+      </view> -->
     </view>
 
     <wd-message-box selector="wd-message-box-slot">
@@ -82,8 +123,9 @@
         </template>
       </wd-input>
     </wd-message-box>
-
     <wd-toast />
+
+    <view class="h-80px"></view>
   </view>
 </template>
 
@@ -93,6 +135,8 @@ import AuthAPI, { type LoginFormData } from "@/api/auth";
 import { useUserStore } from "@/store/modules/user";
 import { useToast, useMessage } from "wot-design-uni";
 import { ref } from "vue";
+import RegisterForm from "@/components/RegisterForm.vue";
+import NavBarCom from "@/components/NavBar";
 
 import { getIndexData } from "@/utils/auth";
 const indexData = ref(getIndexData());
@@ -104,6 +148,10 @@ const loading = ref(false);
 const userStore = useUserStore();
 const showPassword = ref(false);
 const joy = ref("https://picsum.photos/200/300");
+const rememberAccount = ref(false);
+const showRegister = ref(false); // 控制显示登录还是注册表单
+
+const topNav = ref(indexData.value.topNav[1]);
 
 // 登录表单数据
 const loginFormData = ref<LoginFormData>({
@@ -168,25 +216,50 @@ const handleLogin = () => {
     });
 };
 
-// 跳转到用户协议页面
-const navigateToUserAgreement = () => {
+// 处理忘记密码
+const handleForgotPassword = () => {
+  // 实现忘记密码功能
   uni.navigateTo({
-    url: "/pages/mine/user-agreement/index",
+    url: "/pages/mine/forgot-password/index",
   });
 };
 
-// 跳转到隐私政策页面
-const navigateToPrivacy = () => {
-  uni.navigateTo({
-    url: "/pages/mine/privacy/index",
+// 下载APP
+const downloadApp = () => {
+  // 实现APP下载功能
+  uni.showToast({
+    title: "正在前往下载页面",
+    icon: "none",
   });
 };
 
-// 跳转到注册页面
-const goToRegister = () => {
+// 打开赛手浏览器
+// const openBrowser = () => {
+//   // 实现打开浏览器功能
+//   uni.showToast({
+//     title: "正在打开赛手浏览器",
+//     icon: "none",
+//   });
+// };
+
+// 随便逛逛
+const justBrowse = () => {
   uni.navigateTo({
-    url: "/pages/register/index",
+    url: "/pages/index/index",
   });
+};
+
+// 去电脑版
+// const goToDesktop = () => {
+//   uni.showToast({
+//     title: "正在前往电脑版",
+//     icon: "none",
+//   });
+// };
+
+// 处理注册成功
+const handleRegisterSuccess = () => {
+  toast.success("注册成功，请登录");
 };
 </script>
 
@@ -196,13 +269,8 @@ const goToRegister = () => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  height: 100vh;
-  overflow: hidden;
-  background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
-}
-
-.login-bg {
-  display: none; /* 隐藏原背景图 */
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa, #e4e7eb);
 }
 
 .header {
@@ -214,24 +282,15 @@ const goToRegister = () => {
 }
 
 .logo {
-  width: 140px;
-  height: 140px;
-  margin-bottom: 5px;
+  width: 120px;
+  height: 120px;
 }
 
-.title {
-  margin-bottom: 10rpx;
-  font-size: 48rpx;
+.website {
+  font-size: 32rpx;
   font-weight: bold;
-  color: #ffffff;
-  text-shadow: 0 2rpx 4rpx rgba(0, 0, 0, 0.1);
-}
-
-.subtitle {
-  font-size: 28rpx;
-  color: #ffffff;
-  text-align: center;
-  text-shadow: 0 2rpx 4rpx rgba(0, 0, 0, 0.1);
+  color: #0052d9;
+  text-shadow: 0 1rpx 2rpx rgba(0, 0, 0, 0.1);
 }
 
 .login-card {
@@ -239,12 +298,30 @@ const goToRegister = () => {
   display: flex;
   flex-direction: column;
   width: 90%;
-  margin-top: 80rpx;
+  margin-top: 40rpx;
   overflow: hidden;
-  background-color: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(10px);
-  border-radius: 24rpx;
-  box-shadow: 0 8rpx 40rpx rgba(0, 0, 0, 0.1);
+  background-color: #fff;
+  border-radius: 20rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.1);
+}
+
+.tab-header {
+  display: flex;
+  width: 100%;
+  border-bottom: 1px solid #eee;
+}
+
+.tab-item {
+  flex: 1;
+  padding: 30rpx 0;
+  font-size: 32rpx;
+  color: #666;
+  text-align: center;
+}
+
+.tab-item.active {
+  color: #0052d9;
+  border-bottom: 3px solid #0052d9;
 }
 
 .form-wrap {
@@ -255,123 +332,110 @@ const goToRegister = () => {
   position: relative;
   display: flex;
   align-items: center;
-  padding: 24rpx 0;
+  margin-bottom: 30rpx;
+  background-color: #f5f7fa;
+  border-radius: 10rpx;
 }
 
-.input-icon {
-  margin-right: 20rpx;
+.input-icon-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 80rpx;
+  height: 80rpx;
 }
 
 .form-input {
   flex: 1;
-  height: 60rpx;
+  height: 80rpx;
   font-size: 28rpx;
-  line-height: 60rpx;
+  line-height: 80rpx;
   color: #333;
+  background-color: transparent;
 }
 
-.clear-icon,
-.eye-icon {
-  padding: 10rpx;
+.eye-icon-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 80rpx;
+  height: 80rpx;
 }
 
-.divider {
-  height: 1px;
-  margin: 0;
-  background-color: rgba(0, 0, 0, 0.06);
+.account-options {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 30rpx;
+}
+
+.remember-account {
+  display: flex;
+  align-items: center;
+  font-size: 24rpx;
+  color: #666;
+}
+
+.forgot-password {
+  font-size: 24rpx;
+  color: #0052d9;
 }
 
 .login-btn {
   width: 100%;
   height: 90rpx;
-  margin-top: 60rpx;
+  margin-top: 20rpx;
   font-size: 32rpx;
   line-height: 90rpx;
   color: #fff;
-  background: linear-gradient(90deg, #165dff, #4080ff);
+  background: linear-gradient(90deg, #0052d9, #2979ff);
   border: none;
-  border-radius: 45rpx;
-  box-shadow: 0 8rpx 20rpx rgba(22, 93, 255, 0.3);
+  border-radius: 10rpx;
+  box-shadow: 0 4rpx 10rpx rgba(41, 121, 255, 0.3);
   transition: all 0.3s;
 }
 
 .login-btn:active {
-  box-shadow: 0 4rpx 10rpx rgba(22, 93, 255, 0.2);
+  box-shadow: 0 2rpx 5rpx rgba(41, 121, 255, 0.2);
   transform: translateY(2rpx);
 }
 
-.other-login {
-  margin-top: 60rpx;
-}
-
-.other-login-title {
+.download-area {
   display: flex;
-  align-items: center;
-  margin-bottom: 40rpx;
+  justify-content: space-between;
+  margin-top: 40rpx;
 }
 
-.line {
-  flex: 1;
-  height: 1px;
-  background-color: rgba(0, 0, 0, 0.08);
-}
-
-.text {
-  padding: 0 30rpx;
-  font-size: 26rpx;
-  color: #9ca3af;
-}
-
-.wechat-login {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 30rpx;
-}
-.wechat-icon-wrapper {
+.download-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 90rpx;
-  height: 90rpx;
-  background-color: #fff;
-  border-radius: 50%;
-  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.08);
+  width: 48%;
+  height: 80rpx;
+  font-size: 28rpx;
+  color: #666;
+  background-color: #f5f7fa;
+  border-radius: 10rpx;
 }
 
-.wechat-icon {
-  width: 60rpx;
-  height: 60rpx;
-}
-
-.agreement {
-  display: flex;
-  justify-content: center;
-  margin-top: 30rpx;
-  font-size: 24rpx;
-}
-
-.agreement .text {
-  padding: 0 4rpx;
-  color: #9ca3af;
-}
-
-.agreement .link {
-  color: #165dff;
-}
-
-.register-link {
-  display: flex;
-  justify-content: center;
+.bottom-links {
+  justify-content: space-around;
+  width: 100%;
+  height: 100rpx;
   margin-top: 20rpx;
-  font-size: 24rpx;
+  background-color: #666;
 }
 
-.register-link .text {
-  padding: 0 4rpx;
-  color: #9ca3af;
+.link-item {
+  display: flex;
+  align-items: center;
+  padding: 20rpx;
 }
 
-.register-link .link {
-  color: #165dff;
+.link-item text {
+  margin-left: 10rpx;
+  font-size: 28rpx;
+  color: #fff;
+  text-shadow: 0 1rpx 2rpx rgba(0, 0, 0, 0.2);
 }
 </style>

@@ -22,6 +22,7 @@ declare module 'vue' {
     QiunDataCharts: typeof import('./../components/qiun-data-charts/qiun-data-charts.vue')['default']
     QiunError: typeof import('./../components/qiun-error/qiun-error.vue')['default']
     QiunLoading: typeof import('./../components/qiun-loading/qiun-loading.vue')['default']
+    RegisterForm: typeof import('./../components/RegisterForm.vue')['default']
     Tabbar: typeof import('./../components/Tabbar/index.vue')['default']
     TodoItem: typeof import('./../components/todo/TodoItem.vue')['default']
     TodoList: typeof import('./../components/todo/TodoList.vue')['default']

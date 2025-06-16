@@ -23,6 +23,7 @@
         :height="20"
         :src="indexData.imagePrefix + topNav.left_btn"
         class="logo"
+        @click="back"
       />
     </template>
     <template #right>
@@ -40,8 +41,27 @@
 
 <script setup lang="ts">
 import { getIndexData } from "@/utils/auth";
-const indexData = getIndexData();
-const topNav = ref(indexData.topNav[0]);
+const indexData = ref(getIndexData());
+const props = defineProps({
+  topNav: {
+    type: Object,
+    default: () => {
+      return {};
+    },
+  },
+  isIndex: {
+    type: Boolean,
+    default: false,
+  },
+});
+const { topNav, isIndex } = toRefs(props);
+const back = () => {
+  if (isIndex.value) {
+    uni.reLaunch({
+      url: "/pages/index/index",
+    });
+  }
+};
 </script>
 
 <style setup lang="scss">

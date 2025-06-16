@@ -1,6 +1,6 @@
 <template>
   <view style="width: 100%; height: var(--status-bar-height)" />
-  <NavBarCom style="z-index: 9999" />
+  <NavBarCom v-if="topNav" style="z-index: 9999" :top-nav="topNav" />
   <view class="layout">
     <SwiperCom />
     <NoticeBarCom />
@@ -18,6 +18,9 @@ import SwiperCom from "@/pages/index/components/Swiper";
 import NoticeBarCom from "@/pages/index/components/NoticeBar";
 import TargetUrlCom from "@/pages/index/components/TargetUrl";
 import GameIndexCom from "@/pages/index/components/GameIndex";
+import { getIndexData } from "@/utils/auth";
+const indexData = ref(getIndexData());
+const topNav = ref(indexData.value.topNav[0]);
 </script>
 
 <style setup lang="scss">

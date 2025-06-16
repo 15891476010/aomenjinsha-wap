@@ -1,7 +1,9 @@
 <template>
   <view class="youhui-container">
     <view class="user-left">
-      <text class="username">{{ userInfo ? userInfo.username : "未登录" }}</text>
+      <text class="username">
+        {{ userInfo && userInfo.username ? userInfo.username : "未登录" }}
+      </text>
       <text class="balance">{{ userInfo ? userInfo.balance : 0.0 }} RMB</text>
     </view>
     <!-- 用户信息和金额展示 -->
@@ -56,7 +58,7 @@ import TabbarCom from "@/components/Tabbar/index.vue";
 import { ref, onMounted } from "vue";
 import { useUserStore } from "@/store/modules/user";
 const userStore = useUserStore();
-const userInfo = ref<any>(userStore.userInfo);
+const userInfo = ref<any>(userStore.userInfo || {});
 import { getIndexData } from "@/utils/auth";
 const indexData = ref(getIndexData());
 

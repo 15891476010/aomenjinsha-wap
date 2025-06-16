@@ -22,17 +22,13 @@
     class="game-section"
   >
     <view class="section-header">
-      <view class="section-title">
-        <image
-          class="category-icon"
-          :src="indexData.imagePrefix + category.icon"
-          mode="aspectFit"
-        />
-        <text>{{ category.title }}</text>
-      </view>
-      <view class="section-more" @click="navigateToMore(category.id)">
-        <text>全部</text>
-        <wd-icon name="arrow-right" size="14" />
+      <view class="category-title">
+        <image class="icon" :src="indexData.imagePrefix + category.icon" mode="aspectFit" />
+        <text class="title">{{ category.title }}</text>
+        <view class="more" @click="navigateToMore(category.id)">
+          <text>全部</text>
+          <wd-icon name="arrow-right" size="14" />
+        </view>
       </view>
     </view>
 
@@ -43,7 +39,7 @@
       <view class="jackpot-amount">9,084,026.77</view>
     </view>
 
-    <view class="game-grid">
+    <view v-if="categoryIndex === 0" class="game-grid">
       <view
         v-for="(game, index) in category.gameCategoryData"
         :key="index"
@@ -58,6 +54,21 @@
           <view v-if="game.burstRate" class="game-burst-rate">{{ game.burstRate }}万倍</view>
         </view>
         <view class="game-name">{{ game.title }}</view>
+      </view>
+    </view>
+
+    <view v-else class="game-grid-premium">
+      <view
+        v-for="(game, index) in category.gamePlatType"
+        :key="index"
+        class="game-card"
+        :style="{ backgroundImage: `url(${indexData.imagePrefix + game.icon})` }"
+        @click="handleGameClick(game)"
+      >
+        <view v-if="game.isHot" class="hot-icon">
+          <image src="/static/images/hot-icon.png" mode="aspectFit" />
+        </view>
+        <view class="game-name">{{ game.platTypeName }}</view>
       </view>
     </view>
 
@@ -236,39 +247,53 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   width: 100%;
-  padding: 10rpx 5rpx;
-  margin-bottom: 15rpx;
+  padding: 15rpx 10rpx;
+  margin-bottom: 20rpx;
   overflow-x: scroll;
   scrollbar-width: none; /* Firefox */
-  background-color: #fff;
-  border-radius: 12rpx;
-  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.05);
+  background: linear-gradient(to right, #ffffff, #f8f9fa);
+  border-radius: 16rpx;
+  box-shadow: 0 5rpx 15rpx rgba(0, 0, 0, 0.08);
   -ms-overflow-style: none; /* IE and Edge */
+
+  &::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+  }
 
   .game-tab {
     display: flex;
     align-items: center;
-    padding: 8rpx 15rpx;
+    padding: 12rpx 20rpx;
     margin-right: 15rpx;
-    font-size: 24rpx;
+    font-size: 26rpx;
     color: #666;
-    border-radius: 20rpx;
-    transition: all 0.3s;
+    background-color: rgba(255, 255, 255, 0.7);
+    border-radius: 25rpx;
+    box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 
     &.active {
       color: #fff;
-      background-color: #0e903f;
+      background: linear-gradient(135deg, #0e903f, #0a7a34);
+      box-shadow: 0 4rpx 12rpx rgba(14, 144, 63, 0.3);
+      transform: translateY(-2rpx);
+    }
+
+    &:active {
+      transform: scale(0.97);
     }
 
     .tab-icon {
-      width: 40rpx;
-      height: 40rpx;
-      margin-right: 6rpx;
+      width: 45rpx;
+      height: 45rpx;
+      margin-right: 8rpx;
       object-fit: contain;
+      filter: drop-shadow(0 2rpx 3rpx rgba(0, 0, 0, 0.1));
     }
 
     text {
-      display: inline-block; // ✅ 确保文字参与横向排列
+      display: inline-block;
+      text-shadow: 0 1rpx 2rpx rgba(0, 0, 0, 0.1);
       white-space: nowrap;
     }
   }
@@ -276,173 +301,276 @@ onUnmounted(() => {
 
 /* 游戏分类区域样式 */
 .game-section {
-  z-index: -1;
+  z-index: 1;
+  padding: 25rpx;
+  margin-top: 25rpx;
+  background: linear-gradient(to bottom, #ffffff, #f9f9f9);
+  border-radius: 20rpx;
+  box-shadow: 0 5rpx 20rpx rgba(0, 0, 0, 0.08);
+  transition: all 0.4s ease;
+
+  &:hover {
+    box-shadow: 0 8rpx 25rpx rgba(0, 0, 0, 0.1);
+  }
+}
+
+/* Jackpot奖池样式 */
+.jackpot-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   padding: 20rpx;
-  margin-top: 20rpx;
-  background-color: #fff;
-  border-radius: 12rpx;
-  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.05);
-  transition: all 0.3s;
+  margin: 15rpx 0 25rpx;
+  background: linear-gradient(135deg, #f5a623, #f8e71c, #f5a623);
+  border-radius: 15rpx;
+  box-shadow: 0 8rpx 20rpx rgba(245, 166, 35, 0.3);
 
-  .section-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 20rpx;
-
-    .section-title {
-      display: flex;
-      align-items: center;
-      font-size: 32rpx;
-      font-weight: bold;
-
-      .category-icon {
-        width: 36px;
-        height: 36px;
-      }
-
-      text {
-        margin-left: 10rpx;
-      }
-    }
-
-    .section-more {
-      display: flex;
-      align-items: center;
-      font-size: 24rpx;
-      color: #999;
-    }
+  .jackpot-icon {
+    position: relative;
+    z-index: 2;
+    width: 50rpx;
+    height: 50rpx;
+    margin-right: 15rpx;
+    filter: drop-shadow(0 3rpx 5rpx rgba(0, 0, 0, 0.2));
   }
 
-  /* Jackpot奖池样式 */
-  .jackpot-container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 15rpx;
-    margin-bottom: 20rpx;
-    background: linear-gradient(to right, #f5a623, #f8e71c);
-    border-radius: 10rpx;
+  .jackpot-text {
+    position: relative;
+    z-index: 2;
+    margin-right: 15rpx;
+    font-size: 32rpx;
+    font-weight: bold;
+    color: #fff;
+    text-shadow: 0 2rpx 4rpx rgba(0, 0, 0, 0.3);
+    letter-spacing: 1rpx;
+  }
 
-    .jackpot-icon {
+  .jackpot-amount {
+    position: relative;
+    z-index: 2;
+    font-size: 36rpx;
+    font-weight: 800;
+    color: #fff;
+    text-shadow: 0 2rpx 4rpx rgba(0, 0, 0, 0.3);
+    letter-spacing: 1rpx;
+  }
+}
+
+/* 游戏网格样式 */
+.game-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20rpx; /* 增加间距使布局更美观 */
+
+  .game-card {
+    position: relative;
+    margin-bottom: 20rpx;
+    transition: transform 0.3s ease;
+
+    &:active {
+      transform: scale(0.97);
+    }
+
+    .game-image-container {
+      position: relative;
+      width: 100%;
+      height: 150rpx; /* 增加高度使图片更大 */
+      overflow: hidden; /* 确保内容不超出容器 */
+      background-color: #f8f8f8; /* 添加背景色 */
+      border-radius: 15rpx; /* 增加圆角 */
+      box-shadow: 0 4rpx 10rpx rgba(0, 0, 0, 0.1); /* 添加轻微阴影 */
+
+      .game-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover; /* 确保图片填充容器 */
+        border-radius: 15rpx; /* 确保图片也有圆角 */
+        transition: transform 0.3s ease;
+      }
+
+      /* 游戏标签定位在图片右上角 */
+      .game-tag {
+        position: absolute;
+        top: 0;
+        right: 2rpx;
+        z-index: 1; /* 确保标签在图片上层 */
+        padding: 4rpx 10rpx;
+        font-size: 20rpx;
+        color: #fff;
+        text-align: center;
+        border-radius: 0 6rpx 0 6rpx; /* 右上圆角与图片圆角保持一致 */
+
+        &.tag-pg {
+          background-color: #ff9800;
+        }
+
+        &.tag-bb {
+          background-color: #2196f3;
+        }
+
+        &.tag-db {
+          background-color: #4caf50;
+        }
+
+        &.tag-pa {
+          background-color: #9c27b0;
+        }
+
+        &.tag-jdb {
+          background-color: #f44336;
+        }
+
+        &.tag-k3 {
+          background-color: #e91e63;
+        }
+
+        &.tag-ssc {
+          background-color: #009688;
+        }
+      }
+
+      .game-burst-rate {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        padding: 4rpx 10rpx;
+        font-size: 20rpx;
+        color: #fff;
+        background-color: rgba(255, 0, 0, 0.8);
+        border-top-right-radius: 8rpx;
+      }
+    }
+
+    .game-name {
+      margin-top: 10rpx;
+      overflow: hidden;
+      font-size: 24rpx;
+      color: #333;
+      text-align: center;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+}
+
+/* 高端大气上档次的游戏网格样式 */
+.game-grid-premium {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20rpx;
+  padding: 15rpx;
+  margin-top: 15rpx;
+  border-radius: 20rpx;
+
+  .game-card {
+    position: relative;
+    width: 100%;
+    height: 0;
+    padding-bottom: 150%; /* 保持1:1的宽高比 */
+    margin-bottom: 20rpx;
+    background-color: #f8f8f8;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    border-radius: 15rpx;
+    box-shadow: 0 4rpx 10rpx rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+
+    &:active {
+      transform: scale(0.97);
+    }
+
+    .hot-icon {
+      position: absolute;
+      top: 10rpx;
+      right: 10rpx;
+      z-index: 2;
       width: 40rpx;
       height: 40rpx;
-      margin-right: 10rpx;
-    }
 
-    .jackpot-text {
-      margin-right: 10rpx;
-      font-size: 28rpx;
-      font-weight: bold;
-      color: #fff;
-    }
-
-    .jackpot-amount {
-      font-size: 32rpx;
-      font-weight: bold;
-      color: #fff;
-    }
-  }
-
-  /* 游戏网格样式 */
-  .game-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 15rpx; /* 增加间距使布局更美观 */
-
-    .game-card {
-      position: relative;
-      margin-bottom: 20rpx;
-
-      .game-image-container {
-        position: relative;
+      image {
         width: 100%;
-        height: 140rpx; /* 增加高度使图片更大 */
-        border-radius: 12rpx; /* 增加圆角 */
-
-        .game-image {
-          width: 100%;
-          height: 100%;
-          border-radius: 12rpx; /* 确保图片也有圆角 */
-        }
-
-        /* 游戏标签定位在图片右上角 */
-        .game-tag {
-          position: absolute;
-          top: 0;
-          right: 2rpx;
-          z-index: 0; /* 确保标签在图片上层 */
-          padding: 4rpx 10rpx;
-          font-size: 20rpx;
-          color: #fff;
-          text-align: center;
-          border-radius: 0 6rpx 0 6rpx; /* 右上圆角与图片圆角保持一致 */
-
-          &.tag-pg {
-            background-color: #ff9800;
-          }
-
-          &.tag-bb {
-            background-color: #2196f3;
-          }
-
-          &.tag-db {
-            background-color: #4caf50;
-          }
-
-          &.tag-pa {
-            background-color: #9c27b0;
-          }
-
-          &.tag-jdb {
-            background-color: #f44336;
-          }
-
-          &.tag-k3 {
-            background-color: #e91e63;
-          }
-
-          &.tag-ssc {
-            background-color: #009688;
-          }
-        }
-
-        .game-burst-rate {
-          position: absolute;
-          bottom: 0;
-          left: 0;
-          padding: 4rpx 10rpx;
-          font-size: 20rpx;
-          color: #fff;
-          background-color: rgba(255, 0, 0, 0.8);
-          border-top-right-radius: 8rpx;
-        }
-      }
-
-      .game-name {
-        margin-top: 10rpx;
-        overflow: hidden;
-        font-size: 24rpx;
-        color: #333;
-        text-align: center;
-        text-overflow: ellipsis;
-        white-space: nowrap;
+        height: 100%;
       }
     }
+
+    .game-name {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      padding: 8rpx 0;
+      font-size: 24rpx;
+      color: #fff;
+      text-align: center;
+      background-color: rgba(0, 0, 0, 0.6);
+      border-radius: 0 0 15rpx 15rpx;
+    }
+  }
+}
+
+/* 分类标题样式 */
+.category-title {
+  display: flex;
+  align-items: center;
+  padding: 25rpx 15rpx;
+  margin-bottom: 15rpx;
+  background: linear-gradient(to right, rgba(255, 255, 255, 0.9), rgba(245, 245, 245, 0.7));
+  border-radius: 15rpx;
+  box-shadow: 0 3rpx 10rpx rgba(0, 0, 0, 0.05);
+
+  .icon {
+    width: 45rpx;
+    height: 45rpx;
+    margin-right: 15rpx;
+    filter: drop-shadow(0 2rpx 3rpx rgba(0, 0, 0, 0.1));
   }
 
-  /* 查看更多按钮 */
-  .view-more-btn {
+  .title {
+    font-size: 30rpx;
+    font-weight: bold;
+    color: #222;
+    text-shadow: 0 1rpx 2rpx rgba(255, 255, 255, 0.8);
+  }
+
+  .more {
     display: flex;
     align-items: center;
-    justify-content: center;
-    width: 80%;
-    height: 70rpx;
-    margin: 30rpx auto 10rpx;
-    font-size: 28rpx;
+    padding: 8rpx 15rpx;
+    margin-left: auto;
+    font-size: 24rpx;
     color: #666;
-    background-color: #f5f5f5;
-    border-radius: 35rpx;
+    background-color: rgba(255, 255, 255, 0.7);
+    border-radius: 20rpx;
+    box-shadow: 0 2rpx 5rpx rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+
+    &:active {
+      background-color: rgba(240, 240, 240, 0.9);
+      transform: scale(0.95);
+    }
+  }
+}
+
+/* 查看更多按钮 */
+.view-more-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 80%;
+  height: 80rpx;
+  margin: 40rpx auto 15rpx;
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #555;
+  background: linear-gradient(to right, #f8f9fa, #e9ecef, #f8f9fa);
+  border-radius: 40rpx;
+  box-shadow: 0 5rpx 15rpx rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+
+  &:active {
+    box-shadow: 0 3rpx 8rpx rgba(0, 0, 0, 0.05);
+    transform: translateY(2rpx);
   }
 }
 </style>

@@ -45,6 +45,7 @@ onMounted(() => {
   position: absolute !important;
   top: 0 !important;
   height: 250rpx !important;
-  border: 1px solid #e5e5e5e5;
+  overflow: hidden !important;
+  border: 1px solid #e5e5e5e5 !important;
 }
 </style>
