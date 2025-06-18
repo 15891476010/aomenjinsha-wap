@@ -1,7 +1,5 @@
 <template>
   <view class="login-container">
-    <NavBarCom v-if="topNav" style="z-index: 9999" :top-nav="topNav" :is-index="true" />
-    <view style="width: 100%; height: 50rpx" />
     <!-- Logo和标题区域 -->
     <view class="header">
       <image :src="indexData.imagePrefix + indexData.logo" class="logo" mode="aspectFit" />
@@ -136,7 +134,6 @@ import { useUserStore } from "@/store/modules/user";
 import { useToast, useMessage } from "wot-design-uni";
 import { ref } from "vue";
 import RegisterForm from "@/components/RegisterForm.vue";
-import NavBarCom from "@/components/NavBar";
 
 import { getIndexData } from "@/utils/auth";
 const indexData = ref(getIndexData());
@@ -150,8 +147,6 @@ const showPassword = ref(false);
 const joy = ref("https://picsum.photos/200/300");
 const rememberAccount = ref(false);
 const showRegister = ref(false); // 控制显示登录还是注册表单
-
-const topNav = ref(indexData.value.topNav[1]);
 
 // 登录表单数据
 const loginFormData = ref<LoginFormData>({

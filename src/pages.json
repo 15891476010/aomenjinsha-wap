@@ -89,7 +89,9 @@
     {
       "path": "pages/login/index",
       "style": {
-        "navigationStyle": "custom"
+        "navigationBarTitleText": "登录",
+        "navigationBarBackgroundColor": "#286ceb",
+        "navigationBarTextStyle": "white"
       }
     },
     {

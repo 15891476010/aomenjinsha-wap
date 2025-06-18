@@ -26,6 +26,7 @@ export function checkLogin(): boolean {
 }
 
 export function setIndexData(data: any) {
+  uni.removeStorageSync(INDEX_DATA_KEY);
   uni.setStorageSync(INDEX_DATA_KEY, encrypt(data));
 }
 

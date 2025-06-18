@@ -1,8 +1,20 @@
 <script setup lang="ts">
 import { onLaunch, onShow, onHide } from "@dcloudio/uni-app";
+import { getIndexData } from "@/utils/auth";
+const indexData = ref(getIndexData());
 
 onLaunch(() => {
-  console.log("App Launch");
+  // #ifdef H5
+  document.title = indexData.value.websiteName;
+  // 动态设置favicon
+  let link = document.querySelector('link[rel="icon"]');
+  if (!link) {
+    link = document.createElement("link");
+    link.rel = "icon";
+    document.head.appendChild(link);
+  }
+  link.href = `${indexData.value.imagePrefix}${indexData.value.favicon}`;
+  // #endif
 });
 
 onShow(() => {

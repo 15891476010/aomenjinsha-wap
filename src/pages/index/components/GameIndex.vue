@@ -393,7 +393,7 @@ onUnmounted(() => {
         position: absolute;
         top: 0;
         right: 2rpx;
-        z-index: 1; /* 确保标签在图片上层 */
+        z-index: 0; /* 确保标签在图片上层 */
         padding: 4rpx 10rpx;
         font-size: 20rpx;
         color: #fff;
