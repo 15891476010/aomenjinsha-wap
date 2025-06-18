@@ -16,6 +16,16 @@ const PublicApi = {
       method: "POST",
       data
     })
+  },
+  /**
+   * 前端根据id获取游戏分类
+   */
+  getGameCategoryByIdApi(id: number) {
+    return request<any>({
+      url: `${CONFIG_BASE_URL}/getGameCategoryById`,
+      method: "POST",
+      data: id
+    })
   }
 };
 

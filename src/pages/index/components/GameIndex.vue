@@ -63,7 +63,7 @@
         :key="index"
         class="game-card"
         :style="{ backgroundImage: `url(${indexData.imagePrefix + game.icon})` }"
-        @click="handleGameClick(game)"
+        @click="navigateToMore(category.id, game.id)"
       >
         <view v-if="game.isHot" class="hot-icon">
           <image src="/static/images/hot-icon.png" mode="aspectFit" />
@@ -215,9 +215,12 @@ async function handleGameClick(game: any) {
 }
 
 // 查看更多游戏
-function navigateToMore(category) {
-  console.log("查看更多:", category);
+function navigateToMore(categoryId: number | string, gameId: any) {
+  console.log("查看更多:", categoryId, gameId);
   // 这里可以添加跳转到游戏列表页的逻辑
+  uni.navigateTo({
+    url: `/pages/game/index?categoryId=${categoryId}&gameId=${gameId}`,
+  });
 }
 
 onMounted(() => {

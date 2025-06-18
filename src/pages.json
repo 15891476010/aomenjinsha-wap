@@ -176,6 +176,12 @@
       "style": {
         "navigationBarTitleText": "提现"
       }
+    },
+    {
+      "path": "pages/game/index",
+      "style": {
+        "navigationBarTitleText": ""
+      }
     }
   ],
   "globalStyle": {
