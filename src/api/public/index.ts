@@ -26,6 +26,16 @@ const PublicApi = {
       method: "POST",
       data: id
     })
+  },
+  /**
+   * 根据平台类型获取游戏列表
+   */
+  getGameListByPlatformApi(data: any) {
+    return request<any>({
+      url: `${CONFIG_BASE_URL}/getGamePlatTypeList`,
+      method: "POST",
+      data
+    })
   }
 };
 

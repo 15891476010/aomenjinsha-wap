@@ -2,6 +2,32 @@ import { getToken, clearAll } from "@/utils/cache";
 import { ResultCodeEnum } from "@/enums/ResultCodeEnum";
 import { decrypt, encrypt } from "@/utils/AESUtil";
 
+// 全局加载状态管理
+import { ref } from "vue";
+
+// 创建响应式的加载状态
+export const loadingState = ref({
+  show: false,
+  title: "加载中...",
+  customIcon: "",
+  mask: true,
+});
+
+// 显示自定义加载
+function showCustomLoading(title?: string, customIcon?: string) {
+  loadingState.value = {
+    show: true,
+    title: title || "加载中...",
+    customIcon: customIcon || "/static/images/loading.svg",
+    mask: true,
+  };
+}
+
+// 隐藏自定义加载
+function hideCustomLoading() {
+  loadingState.value.show = false;
+}
+
 // 基础URL
 const baseUrl = import.meta.env.VITE_APP_API_URL;
 
@@ -68,12 +94,34 @@ export function requestSimple(options: RequestOptions) {
 }
 
 // 原有的完整请求函数
-export default function request<T>(options: UniApp.RequestOptions): Promise<T> {
+export default function request<T>(
+  options: UniApp.RequestOptions & {
+    loading?: boolean;
+    loadingTitle?: string;
+    loadingIcon?: string;
+  }
+): Promise<T> {
   // H5 使用 VITE_APP_BASE_API 作为代理路径，其他平台使用 VITE_APP_API_URL 作为请求路径
   let baseApi = import.meta.env.VITE_APP_API_URL;
   // #ifdef H5
   // baseApi = import.meta.env.VITE_APP_BASE_API;
   // #endif
+
+  // 显示加载图标，默认显示
+  const showLoading = options.loading !== false;
+  if (showLoading) {
+    // 使用自定义加载组件或默认的uni.showLoading
+    if (options.loadingIcon) {
+      // 使用自定义加载组件
+      showCustomLoading(options.loadingTitle, options.loadingIcon);
+    } else {
+      // 使用默认加载
+      uni.showLoading({
+        title: options.loadingTitle || "加载中...",
+        mask: true,
+      });
+    }
+  }
 
   return new Promise((resolve, reject) => {
     // 判断是否需要加密请求体
@@ -133,6 +181,14 @@ export default function request<T>(options: UniApp.RequestOptions): Promise<T> {
       },
       fail: (error) => {
         console.log("fail error", error);
+        // 隐藏加载图标
+        if (showLoading) {
+          if (options.loadingIcon) {
+            hideCustomLoading();
+          } else {
+            uni.hideLoading();
+          }
+        }
         uni.showToast({
           title: "网络请求失败",
           icon: "none",
@@ -142,6 +198,16 @@ export default function request<T>(options: UniApp.RequestOptions): Promise<T> {
           message: "网络请求失败",
           error,
         });
+      },
+      complete: () => {
+        // 请求完成时隐藏加载图标
+        if (showLoading) {
+          if (options.loadingIcon) {
+            hideCustomLoading();
+          } else {
+            uni.hideLoading();
+          }
+        }
       },
     });
 
