@@ -25,7 +25,7 @@
       <view class="category-title">
         <image class="icon" :src="indexData.imagePrefix + category.icon" mode="aspectFit" />
         <text class="title">{{ category.title }}</text>
-        <view class="more" @click="navigateToMore(category.id)">
+        <view v-if="categoryIndex !== 0" class="more" @click="navigateToMore(category.id)">
           <text>全部</text>
           <wd-icon name="arrow-right" size="14" />
         </view>
@@ -73,15 +73,14 @@
     </view>
 
     <!-- 查看更多按钮 -->
-    <view class="view-more-btn" @click="navigateToMore(category.id)">查看更多</view>
+    <view v-if="categoryIndex !== 0" class="view-more-btn" @click="navigateToMore(category.id)">
+      查看更多
+    </view>
   </view>
   <wd-toast />
 </template>
 
 <script setup lang="ts">
-import { useToast } from "wot-design-uni";
-
-const toast = useToast();
 import PublicApi, { GamePageQuery } from "@/api/public";
 import GameApi from "@/api/game";
 import { getIndexData } from "@/utils/auth";
@@ -205,21 +204,16 @@ async function getGameList() {
 // 处理游戏点击
 async function handleGameClick(game: any) {
   const res = await GameApi.getGameUrlApi(game.id.toString());
-  if (res && res.play_html) {
-    document.open();
-    document.write(res.play_html);
-    document.close();
-  } else {
-    toast.error("未获取到游戏页面内容");
-  }
+  uni.navigateTo({
+    url: `/pages/index/components/gamePage?url=${res.play_url}`,
+  });
 }
 
 // 查看更多游戏
 function navigateToMore(categoryId: number | string, gameId: any) {
-  console.log("查看更多:", categoryId, gameId);
-  // 这里可以添加跳转到游戏列表页的逻辑
+  const str = gameId ? `&platTypeId=${gameId}` : "";
   uni.navigateTo({
-    url: `/pages/game/index?categoryId=${categoryId}&gameId=${gameId}`,
+    url: `/pages/game/index?categoryId=${categoryId}${str}`,
   });
 }
 
@@ -394,8 +388,8 @@ onUnmounted(() => {
       /* 游戏标签定位在图片右上角 */
       .game-tag {
         position: absolute;
-        top: 0;
-        right: 2rpx;
+        top: 3rpx;
+        right: 5rpx;
         z-index: 0; /* 确保标签在图片上层 */
         padding: 4rpx 10rpx;
         font-size: 20rpx;

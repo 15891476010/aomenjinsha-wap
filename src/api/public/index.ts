@@ -36,7 +36,17 @@ const PublicApi = {
       method: "POST",
       data
     })
-  }
+  },
+  /**
+   * 前端根据id获取游戏平台列表
+   */
+  getGamePlatTypeByCaIdApi(id: number) {
+    return request<any>({
+      url: `${CONFIG_BASE_URL}/getGamePlatTypeByCaId`,
+      method: "POST",
+      data: id
+    })
+  },
 };
 
 export interface GamePageQuery {

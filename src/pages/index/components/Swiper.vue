@@ -1,16 +1,26 @@
 <template>
-  <wd-swiper
-    v-model:current="current"
-    :list="swiperList"
-    class="swiper-container"
-    customItemClass="swiper-item"
-    value-key="image"
-    autoplay
-    :indicator="{ type: 'dots-bar' }"
-    imageMode="scaleToFill"
-    @click="handleClick"
-    @change="onChange"
-  ></wd-swiper>
+  <view class="custom-swiper-container">
+    <swiper
+      class="custom-swiper"
+      :indicator-dots="true"
+      :autoplay="true"
+      :interval="3000"
+      :duration="500"
+      :circular="true"
+      @change="onChange"
+    >
+      <swiper-item v-for="(item, index) in swiperList" :key="index" @click="handleClick(item)">
+        <image :src="item.image" mode="aspectFill" class="swiper-image" />
+      </swiper-item>
+    </swiper>
+    <view class="custom-indicator">
+      <view
+        v-for="(item, index) in swiperList"
+        :key="index"
+        :class="['indicator-dot', current === index ? 'active' : '']"
+      ></view>
+    </view>
+  </view>
 </template>
 
 <script setup lang="ts">
@@ -24,11 +34,19 @@ function addPrefix() {
     item.image = indexData.value.imagePrefix + item.image;
   });
 }
-function handleClick(e) {
-  console.log(e);
+function handleClick(item) {
+  console.log("点击了轮播图项目:", item);
+  // 这里可以添加跳转逻辑，例如：
+  // if (item.url) {
+  //   uni.navigateTo({
+  //     url: item.url
+  //   });
+  // }
 }
+
 function onChange(e) {
-  console.log(e);
+  current.value = e.detail.current;
+  console.log("轮播图切换到:", current.value);
 }
 
 onMounted(() => {
@@ -37,15 +55,49 @@ onMounted(() => {
 </script>
 
 <style lang="scss">
-.swiper-container {
+.custom-swiper-container {
+  position: relative;
+  width: 100%;
+  height: 250rpx;
+  margin: 20rpx 0;
+  overflow: hidden;
+  border-radius: 12rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.1);
+}
+
+.custom-swiper {
+  width: 100%;
   height: 250rpx;
 }
 
-.swiper-item {
-  position: absolute !important;
-  top: 0 !important;
-  height: 250rpx !important;
-  overflow: hidden !important;
-  border: 1px solid #e5e5e5e5 !important;
+.swiper-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.custom-indicator {
+  position: absolute;
+  bottom: 20rpx;
+  left: 50%;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: translateX(-50%);
+}
+
+.indicator-dot {
+  width: 16rpx;
+  height: 16rpx;
+  margin: 0 8rpx;
+  background-color: rgba(255, 255, 255, 0.6);
+  border-radius: 8rpx;
+  transition: all 0.3s ease;
+}
+
+.indicator-dot.active {
+  width: 24rpx;
+  background-color: #ffffff;
 }
 </style>

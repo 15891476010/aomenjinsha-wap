@@ -9,8 +9,8 @@
         cancel-txt="搜索"
         @cancel="handleQuery"
       />
-      <view class="content-container">
-        <view v-if="isShow" class="sidebar">
+      <view v-if="isShow" class="content-container">
+        <view class="sidebar">
           <view
             v-for="(item, index) in gamePlatTypes"
             :key="index"
@@ -39,9 +39,9 @@
               :style="{ backgroundImage: `url(${indexData.imagePrefix + game.icon})` }"
               @click="handleGameClick(game)"
             >
-              <view v-if="game.tag" class="game-tag" :class="`tag-${game.tag.toLowerCase()}`">
+              <!-- <view v-if="game.tag" class="game-tag" :class="`tag-${game.tag.toLowerCase()}`">
                 {{ game.tag }}
-              </view>
+              </view> -->
               <view class="game-name">{{ game.title }}</view>
             </view>
           </view>
@@ -66,6 +66,36 @@
           @change="handleChange"
         />
       </view>
+
+      <view v-else class="content-container">
+        <!-- 游戏卡片网格 -->
+        <view class="game-container">
+          <view v-if="categoryList.length > 0" class="game-grid">
+            <view
+              v-for="(game, index) in categoryList"
+              :key="index"
+              class="game-card"
+              :style="{ backgroundImage: `url(${indexData.imagePrefix + game.icon})` }"
+              @click="handleGameClick(game)"
+            >
+              <!-- <view v-if="game.tag" class="game-tag" :class="`tag-${game.tag.toLowerCase()}`">
+                {{ game.tag }}
+              </view> -->
+              <view class="game-name">{{ game.platTypeName }}</view>
+            </view>
+          </view>
+          <wd-status-tip
+            v-else
+            :image-size="{
+              height: 200,
+              width: 300,
+            }"
+            image="search"
+            tip="当前搜索无结果"
+          />
+          <view class="h-50"></view>
+        </view>
+      </view>
     </view>
     <wd-toast />
   </view>
@@ -75,6 +105,7 @@
 import PublicApi from "@/api/public";
 import { getIndexData } from "@/utils/auth";
 import { useToast } from "wot-design-uni";
+import GameApi from "@/api/game";
 
 const toast = useToast();
 const indexData = ref(getIndexData());
@@ -91,10 +122,12 @@ const isShow = ref(true);
 const gamePlatTypes = ref([]);
 const gameList = ref([]);
 const loading = ref(false);
-
+const platTypeId = ref(null);
+const categoryList = ref([]);
 // 在页面加载时设置标题
 onLoad((options) => {
   querParams.categoryId = options?.categoryId || "0";
+  platTypeId.value = options?.platTypeId;
   if (
     querParams.categoryId == "3" ||
     querParams.categoryId == "6" ||
@@ -124,11 +157,22 @@ async function handleQuery() {
     setPageTitle(res.title);
     gamePlatTypes.value = res.gamePlatTypes;
     if (isShow.value) {
-      querParams.platType = res.gamePlatTypes[0].platType;
+      if (platTypeId.value) {
+        const plat = res.gamePlatTypes.filter((item) => {
+          return item.id === platTypeId.value;
+        });
+        querParams.platType = plat[0].platType;
+      } else {
+        querParams.platType = res.gamePlatTypes[0].platType;
+      }
     }
 
-    // 获取游戏列表
-    await fetchGameList();
+    if (isShow.value) {
+      // 获取游戏列表
+      await fetchGameList();
+    } else {
+      await fetchGamePlatTypeByList();
+    }
   } catch (error) {
     console.error("获取数据失败", error);
     toast.error("获取数据失败");
@@ -154,10 +198,39 @@ async function fetchGameList() {
   }
 }
 
+async function fetchGamePlatTypeByList() {
+  try {
+    const res = await PublicApi.getGamePlatTypeByCaIdApi(querParams.categoryId);
+    categoryList.value = res;
+  } catch (error) {
+    console.error("获取游戏平台类型失败", error);
+  }
+}
+
 // 处理侧边栏点击
 function handleSidebarItemClick(platType) {
+  const plat = gamePlatTypes.value.filter((item) => {
+    return item.platType === platType;
+  });
   querParams.platType = platType;
   querParams.pageNum = 1;
+
+  // 更新URL参数，不刷新页面
+  const currentRoute = getCurrentPages()[getCurrentPages().length - 1].route;
+  const newUrl = `#/${currentRoute}?categoryId=${querParams.categoryId}&platTypeId=${plat[0].id}`;
+
+  // 使用history API更新URL，不触发页面跳转
+  // #ifdef H5
+  history.replaceState({}, "", newUrl);
+  // #endif
+
+  // 在非H5环境下，可以使用uni.redirectTo，但会刷新页面
+  // #ifndef H5
+  // uni.redirectTo({
+  //   url: newUrl
+  // });
+  // #endif
+
   fetchGameList();
 }
 
@@ -172,12 +245,26 @@ watch(
 );
 
 // 处理游戏点击
-function handleGameClick(game) {
-  console.log("点击游戏", game);
-  // 根据实际需求跳转到游戏详情页或直接启动游戏
-  toast.success(`即将进入游戏: ${game.title}`);
-  // 实际项目中可能需要调用API启动游戏
-  // GameApi.startGame(game.id);
+async function handleGameClick(game: any) {
+  const res = await GameApi.getGameUrlApi(game.id.toString(), isShow.value ? false : true);
+  console.log(res);
+  // 判断res中是否有data属性
+  if (res.data) {
+    // #ifdef H5
+    window.location.href = res.data.url;
+    // #endif
+
+    // #ifdef APP-PLUS || APP-NVUE || APP
+    // 在APP内部打开链接，而不是跳转到外部浏览器
+    uni.navigateTo({
+      url: `/pages/index/components/gamePage?url=${encodeURIComponent(res.data.url)}`,
+    });
+    // #endif
+  } else {
+    uni.navigateTo({
+      url: `/pages/index/components/gamePage?url=${res.play_url}`,
+    });
+  }
 }
 
 // 封装设置标题的方法，方便在不同地方调用
@@ -342,7 +429,7 @@ function setPageTitle(title: string) {
           left: 0;
           width: 100%;
           padding: 8rpx 0;
-          font-size: 24rpx;
+          font-size: 20rpx;
           color: #fff;
           text-align: center;
           background-color: rgba(0, 0, 0, 0.6);
