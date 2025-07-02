@@ -364,10 +364,6 @@ onShow(() => {
         background-image: url("./images/itemBg.avif");
         background-position: center;
         background-size: cover;
-
-        .sidebar-item-icon {
-          border: 2rpx solid rgba(255, 255, 255, 0.5);
-        }
       }
     }
 
