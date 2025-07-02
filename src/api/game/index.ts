@@ -11,6 +11,12 @@ const GameApi = {
       method: "get",
     });
   },
+  getGameHomeUrlApi(id: number | string) {
+    return request<any>({
+      url: `${CONFIG_BASE_URL}/getHomeUrl?id=${id}`,
+      method: "get",
+    });
+  },
   /** 用户额度归户 */
   userTransferApi(data: string) {
     return request<any>({

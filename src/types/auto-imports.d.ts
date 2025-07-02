@@ -19,6 +19,7 @@ declare module 'vue' {
     Loading4: typeof import('./../components/qiun-loading/loading4.vue')['default']
     Loading5: typeof import('./../components/qiun-loading/loading5.vue')['default']
     NavBar: typeof import('./../components/NavBar/index.vue')['default']
+    Pagination: typeof import('./../components/pagination/index.vue')['default']
     QiunDataCharts: typeof import('./../components/qiun-data-charts/qiun-data-charts.vue')['default']
     QiunError: typeof import('./../components/qiun-error/qiun-error.vue')['default']
     QiunLoading: typeof import('./../components/qiun-loading/qiun-loading.vue')['default']

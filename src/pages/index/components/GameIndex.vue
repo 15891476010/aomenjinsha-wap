@@ -25,18 +25,7 @@
       <view class="category-title">
         <image class="icon" :src="indexData.imagePrefix + category.icon" mode="aspectFit" />
         <text class="title">{{ category.title }}</text>
-        <view v-if="categoryIndex !== 0" class="more" @click="navigateToMore(category.id)">
-          <text>全部</text>
-          <wd-icon name="arrow-right" size="14" />
-        </view>
       </view>
-    </view>
-
-    <!-- Jackpot奖池显示 (仅在第二个分类显示) -->
-    <view v-if="categoryIndex === 1" class="jackpot-container">
-      <image class="jackpot-icon" src="/static/images/jackpot-icon.png" mode="aspectFit" />
-      <view class="jackpot-text">Jackpot</view>
-      <view class="jackpot-amount">9,084,026.77</view>
     </view>
 
     <view v-if="categoryIndex === 0" class="game-grid">
@@ -63,18 +52,13 @@
         :key="index"
         class="game-card"
         :style="{ backgroundImage: `url(${indexData.imagePrefix + game.icon})` }"
-        @click="navigateToMore(category.id, game.id)"
+        @click="navigateToMore(category.id, game)"
       >
         <view v-if="game.isHot" class="hot-icon">
           <image src="/static/images/hot-icon.png" mode="aspectFit" />
         </view>
         <view v-if="game.isShowTitle" class="game-name">{{ game.platTypeName }}</view>
       </view>
-    </view>
-
-    <!-- 查看更多按钮 -->
-    <view v-if="categoryIndex !== 0" class="view-more-btn" @click="navigateToMore(category.id)">
-      查看更多
     </view>
   </view>
   <wd-toast />
@@ -106,7 +90,7 @@ const activeTab = ref("");
 const categorySections = ref([]);
 
 // 设置滚动偏移量
-const scrollOffset = 120; // 使用120px的偏移量
+const scrollOffset = 80; // 使用120px的偏移量
 
 // 滚动到对应分类
 function scrollToCategory(categoryId, tabIndex) {
@@ -212,11 +196,21 @@ async function handleGameClick(game: any) {
 }
 
 // 查看更多游戏
-function navigateToMore(categoryId: number | string, gameId: any) {
-  const str = gameId ? `&platTypeId=${gameId}` : "";
-  uni.navigateTo({
-    url: `/pages/game/index?categoryId=${categoryId}${str}`,
-  });
+function navigateToMore(categoryId: number | string, game: any) {
+  console.log(game);
+  if (!game.gameCode) {
+    const str = game ? `&platTypeId=${game.id}` : "";
+    uni.navigateTo({
+      url: `/pages/game/index?categoryId=${categoryId}${str}`,
+    });
+  } else {
+    setGameData(game.tag);
+    GameApi.getGameHomeUrlApi(game.id.toString()).then((res) => {
+      uni.navigateTo({
+        url: `/pages/index/components/gamePage?url=${res.Data.url}`,
+      });
+    });
+  }
 }
 
 onMounted(() => {

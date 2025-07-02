@@ -56,13 +56,19 @@
           />
           <view class="h-50"></view>
         </view>
-        <wd-pagination
+        <!-- <wd-pagination
           v-if="total > 0"
           v-model="querParams.pageNum"
           show-icon
           :total="total"
           :page-size="querParams.pageSize"
           class="pagination-container"
+          @change="handleChange"
+        /> -->
+        <Pagination
+          :total="total"
+          :page="querParams.pageNum"
+          :page-size="querParams.pageSize"
           @change="handleChange"
         />
       </view>
@@ -102,6 +108,7 @@
 </template>
 
 <script setup lang="ts">
+import Pagination from "@/components/pagination";
 import PublicApi from "@/api/public";
 import { getIndexData } from "@/utils/auth";
 import { useToast } from "wot-design-uni";
@@ -145,8 +152,8 @@ onShow(() => {
   // setPageTitle("新的标题");
 });
 
-function handleChange({ value }) {
-  querParams.pageNum = value;
+function handleChange(item: any) {
+  querParams.pageNum = item.pageNum;
   fetchGameList();
 }
 

@@ -1,6 +1,6 @@
 <template>
-  <view v-if="isShow" class="layout">
-    <view class="custom-navbar" :style="{ paddingTop: statusBarHeight + 'px' }">
+  <view class="layout">
+    <view v-if="isShow" class="custom-navbar" :style="{ paddingTop: statusBarHeight + 'px' }">
       <view class="navbar-content">
         <!-- 左侧按钮 -->
         <view class="left-area" @click="backToIndex">
@@ -47,7 +47,7 @@
         </view>
       </view>
     </view>
-    <view class="main">
+    <view v-if="isShow" class="main">
       <view class="h-10"></view>
       <SwiperCom />
       <NoticeBarCom />
