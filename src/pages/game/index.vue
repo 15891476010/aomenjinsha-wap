@@ -54,7 +54,6 @@
             image="search"
             tip="当前搜索无结果"
           />
-          <view class="h-50"></view>
         </view>
         <!-- <wd-pagination
           v-if="total > 0"
@@ -66,6 +65,7 @@
           @change="handleChange"
         /> -->
         <Pagination
+          class="pagination"
           :total="total"
           :page="querParams.pageNum"
           :page-size="querParams.pageSize"
@@ -299,10 +299,8 @@ onShow(() => {
 
 <style lang="scss" scoped>
 .layout {
-  // 使用calc函数减去标题栏高度
-  // 在uni-app中，标题栏高度通常是44px，状态栏高度根据设备不同
   height: calc(100vh - var(--status-bar-height) - 44px);
-  overflow: scroll;
+  overflow: hidden;
   background: #f8f8f8;
 
   .main {
@@ -310,7 +308,16 @@ onShow(() => {
     margin: 0 auto;
 
     .content-container {
+      position: relative;
       display: flex;
+      width: 100%;
+
+      .pagination {
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        width: calc(100% - 120px);
+      }
     }
 
     .sidebar {

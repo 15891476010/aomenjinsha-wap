@@ -119,17 +119,17 @@ const middlePages = computed(() => {
   // 靠近首页
   if (currentPage.value <= 3) {
     startPage = 2;
-    endPage = 4;
+    endPage = 3;
   }
   // 靠近尾页
   else if (currentPage.value >= totalPages.value - 2) {
-    startPage = totalPages.value - 3;
+    startPage = totalPages.value - 2;
     endPage = totalPages.value - 1;
   }
   // 中间位置
   else {
-    startPage = currentPage.value - 1;
-    endPage = currentPage.value + 1;
+    startPage = currentPage.value;
+    endPage = currentPage.value;
   }
 
   for (let i = startPage; i <= endPage; i++) {
@@ -201,13 +201,11 @@ const handleJumpForward = () => {
 
 <style scoped lang="scss">
 .pagination {
-  position: fixed;
-  bottom: 0;
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
   width: 100%;
-  height: 50px;
   padding: 16px;
   font-size: 18px;
   user-select: none;
@@ -250,7 +248,7 @@ const handleJumpForward = () => {
     justify-content: center;
     min-width: 40px;
     //border: 1px solid red;
-    padding: 13px;
+    padding: 10px;
     margin: 2px;
     font-size: 14px;
     font-weight: bold;
