@@ -36,7 +36,7 @@
               v-for="(game, index) in gameList"
               :key="index"
               class="game-card"
-              :style="{ backgroundImage: `url(${indexData.imagePrefix + game.icon})` }"
+              :style="{ backgroundImage: `url(${game.icon})` }"
               @click="handleGameClick(game)"
             >
               <!-- <view v-if="game.tag" class="game-tag" :class="`tag-${game.tag.toLowerCase()}`">
@@ -106,13 +106,14 @@ import PublicApi from "@/api/public";
 import { getIndexData } from "@/utils/auth";
 import { useToast } from "wot-design-uni";
 import GameApi from "@/api/game";
+import { setGameData } from "@/utils/cache";
 
 const toast = useToast();
 const indexData = ref(getIndexData());
 const querParams = reactive({
   categoryId: 0,
   pageNum: 1,
-  pageSize: 30,
+  pageSize: 51,
   title: "",
   platType: "",
 });
@@ -247,23 +248,27 @@ watch(
 // 处理游戏点击
 async function handleGameClick(game: any) {
   const res = await GameApi.getGameUrlApi(game.id.toString(), isShow.value ? false : true);
-  console.log(res);
+  if (res.Code !== 0) {
+    uni.showToast({
+      title: res.Message,
+      icon: "error",
+    });
+    return;
+  }
   // 判断res中是否有data属性
-  if (res.data) {
+  if (res.Data) {
     // #ifdef H5
-    window.location.href = res.data.url;
+    window.location.href = res.Data.url;
     // #endif
 
     // #ifdef APP-PLUS || APP-NVUE || APP
     // 在APP内部打开链接，而不是跳转到外部浏览器
     uni.navigateTo({
-      url: `/pages/index/components/gamePage?url=${encodeURIComponent(res.data.url)}`,
+      url: `/pages/index/components/gamePage?url=${encodeURIComponent(res.Data.url)}`,
     });
     // #endif
-  } else {
-    uni.navigateTo({
-      url: `/pages/index/components/gamePage?url=${res.play_url}`,
-    });
+
+    setGameData(game);
   }
 }
 
@@ -279,6 +284,10 @@ function setPageTitle(title: string) {
     },
   });
 }
+
+onShow(() => {
+  console.log("我显示了");
+});
 </script>
 
 <style lang="scss" scoped>
@@ -369,7 +378,7 @@ function setPageTitle(title: string) {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 20rpx;
-      padding: 15rpx;
+      padding: 0rpx;
       margin-top: 15rpx;
       border-radius: 20rpx;
 
@@ -377,7 +386,8 @@ function setPageTitle(title: string) {
         position: relative;
         width: 100%;
         height: 0;
-        padding-bottom: 150%; /* 保持1:1的宽高比 */
+        padding-bottom: 100%; /* 保持1:1的宽高比 */
+        margin-top: 20px;
         margin-bottom: 20rpx;
         background-color: #f8f8f8;
         background-repeat: no-repeat;
@@ -424,11 +434,10 @@ function setPageTitle(title: string) {
         }
 
         .game-name {
-          position: absolute;
-          bottom: 0;
-          left: 0;
+          position: relative;
           width: 100%;
           padding: 8rpx 0;
+          margin-top: 100%;
           font-size: 20rpx;
           color: #fff;
           text-align: center;

@@ -146,12 +146,10 @@
     </view>
 
     <wd-toast />
-    <TabbarCom />
   </view>
 </template>
 
 <script lang="ts" setup>
-import TabbarCom from "@/components/Tabbar";
 import { useToast } from "wot-design-uni";
 import { useUserStore } from "@/store/modules/user";
 import { useThemeStore } from "@/store/modules/theme";

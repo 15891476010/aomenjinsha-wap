@@ -47,10 +47,10 @@
         @click="handleGameClick(game)"
       >
         <view class="game-image-container">
-          <image class="game-image" :src="indexData.imagePrefix + game.icon" mode="aspectFit" />
-          <view v-if="game.tag" class="game-tag" :class="`tag-${game.tag.toLowerCase()}`">
+          <image class="game-image" :src="game.icon" mode="aspectFit" />
+          <!-- <view v-if="game.tag" class="game-tag" :class="`tag-${game.tag.toLowerCase()}`">
             {{ game.tag }}
-          </view>
+          </view> -->
           <view v-if="game.burstRate" class="game-burst-rate">{{ game.burstRate }}万倍</view>
         </view>
         <view class="game-name">{{ game.title }}</view>
@@ -68,7 +68,7 @@
         <view v-if="game.isHot" class="hot-icon">
           <image src="/static/images/hot-icon.png" mode="aspectFit" />
         </view>
-        <view class="game-name">{{ game.platTypeName }}</view>
+        <view v-if="game.isShowTitle" class="game-name">{{ game.platTypeName }}</view>
       </view>
     </view>
 
@@ -84,6 +84,7 @@
 import PublicApi, { GamePageQuery } from "@/api/public";
 import GameApi from "@/api/game";
 import { getIndexData } from "@/utils/auth";
+import { setGameData } from "@/utils/cache";
 const indexData = ref(getIndexData());
 
 const querParams: GamePageQuery = {
@@ -203,9 +204,10 @@ async function getGameList() {
 
 // 处理游戏点击
 async function handleGameClick(game: any) {
+  setGameData(game.tag);
   const res = await GameApi.getGameUrlApi(game.id.toString());
   uni.navigateTo({
-    url: `/pages/index/components/gamePage?url=${res.play_url}`,
+    url: `/pages/index/components/gamePage?url=${res.Data.url}`,
   });
 }
 

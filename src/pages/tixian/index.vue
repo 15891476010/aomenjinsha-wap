@@ -115,12 +115,10 @@
     <button class="confirm-btn" @click="confirmWithdraw">确认</button>
 
     <view style="height: 80px"></view>
-    <TabbarCom />
   </view>
 </template>
 
 <script setup lang="ts">
-import TabbarCom from "@/components/Tabbar";
 import { DictCodeEnum } from "@/enums/DictCodeEnum";
 import DictAPI from "@/api/system/dict";
 import { onMounted, ref, watch } from "vue";
@@ -205,9 +203,9 @@ watch(current, (newValue) => {
 <style scoped>
 .withdraw-page {
   width: 95%;
-  min-height: 100vh;
   padding: 10px;
   margin: 0 auto;
+  overflow-x: hidden;
   font-family: "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
   background: #f7f8fa;
 }

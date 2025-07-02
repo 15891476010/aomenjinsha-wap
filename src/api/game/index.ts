@@ -11,6 +11,13 @@ const GameApi = {
       method: "get",
     });
   },
+  /** 用户额度归户 */
+  userTransferApi(data: string) {
+    return request<any>({
+      url: `${CONFIG_BASE_URL}/userTransfer?gamePlate=${data}`,
+      method: "POST",
+    });
+  },
 };
 
 export default GameApi;

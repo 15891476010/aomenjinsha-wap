@@ -42,11 +42,6 @@
         </block>
       </wd-tabs>
     </view>
-    <view class="h-200"></view>
-
-    <!-- 底部导航栏 -->
-    <TabbarCom />
-
     <!-- Toast组件 -->
     <wd-toast />
   </view>
@@ -54,7 +49,6 @@
 
 <script setup lang="ts">
 import FrontApi from "@/api/front/index";
-import TabbarCom from "@/components/Tabbar/index.vue";
 import { ref, onMounted } from "vue";
 import { useUserStore } from "@/store/modules/user";
 const userStore = useUserStore();
@@ -80,7 +74,6 @@ async function getOptions() {
 
 // 查看活动详情
 function goDetail(id: number) {
-  console.log(id);
   uni.navigateTo({
     url: `/pages/youhui/detail?id=${id}`,
   });
@@ -94,7 +87,6 @@ function handleChange(e: any) {
 
 function getActiviteList() {
   FrontApi.getActiviteListApi({ pid: tabsIndex.value }).then((res) => {
-    console.log(res);
     activites.value = res;
   });
 }

@@ -34,19 +34,14 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
 import FrontApi from "@/api/front/index";
+import { onLoad } from "@dcloudio/uni-app";
 
 // 活动ID
 const activityId = ref(1);
 const activity = ref<any>({});
 
-// 获取路由参数
-onMounted(() => {
-  const pages = getCurrentPages();
-  const currentPage = pages[pages.length - 1];
-  // @ts-ignore - uni-app特有的路由获取方式
-  const id = currentPage.options?.id || 1;
-  activityId.value = Number(id);
-
+onLoad((options) => {
+  activityId.value = Number(options?.id);
   // 获取活动详情
   getActivityDetail();
 });

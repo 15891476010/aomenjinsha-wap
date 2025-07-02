@@ -114,14 +114,11 @@
       <view>1. 强烈建议使用USDT/电子钱包充值，无限秒到帐，极致体验！</view>
       <view>2. 参与USDT/电子钱包充值专属优惠，乐享优越金融体验！</view>
     </view>
-    <view style="height: 80px"></view>
-    <TabbarCom />
     <wd-toast />
   </view>
 </template>
 
 <script setup lang="ts">
-import TabbarCom from "@/components/Tabbar";
 import { onMounted, ref, computed } from "vue";
 import { useUserStore } from "@/store/modules/user";
 import RechargeApi from "@/api/recharge";
