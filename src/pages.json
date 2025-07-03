@@ -196,42 +196,42 @@
     "navigationBarTitleText": "vue-uniapp-template",
     "navigationBarBackgroundColor": "#F8F8F8",
     "backgroundColor": "#F8F8F8"
-  },
-  "tabBar": {
-    "color": "#474747",
-    "selectedColor": "#0d9742",
-    "backgroundColor": "#F8F8F8",
-    "list": [
-      {
-        "pagePath": "pages/index/index",
-        "iconPath": "static/tabbar/home.avif",
-        "selectedIconPath": "static/tabbar/home-active.avif",
-        "text": "首页"
-      },
-      {
-        "pagePath": "pages/youhui/index",
-        "iconPath": "static/tabbar/yh.avif",
-        "selectedIconPath": "static/tabbar/yh-active.avif",
-        "text": "优惠"
-      },
-      {
-        "pagePath": "pages/chongzhi/index",
-        "iconPath": "static/tabbar/cz.png",
-        "selectedIconPath": "static/tabbar/cz-active.png",
-        "text": "充值"
-      },
-      {
-        "pagePath": "pages/tixian/index",
-        "iconPath": "static/tabbar/tx.png",
-        "selectedIconPath": "static/tabbar/tx-active.png",
-        "text": "提现"
-      },
-      {
-        "pagePath": "pages/mine/index",
-        "iconPath": "static/tabbar/wd.avif",
-        "selectedIconPath": "static/tabbar/wd-active.avif",
-        "text": "我的"
-      }
-    ]
   }
+  // "tabBar": {
+  //   "color": "#474747",
+  //   "selectedColor": "#0d9742",
+  //   "backgroundColor": "#F8F8F8",
+  //   "list": [
+  //     {
+  //       "pagePath": "pages/index/index",
+  //       "iconPath": "static/tabbar/home.avif",
+  //       "selectedIconPath": "static/tabbar/home-active.avif",
+  //       "text": "首页"
+  //     },
+  //     {
+  //       "pagePath": "pages/youhui/index",
+  //       "iconPath": "static/tabbar/yh.avif",
+  //       "selectedIconPath": "static/tabbar/yh-active.avif",
+  //       "text": "优惠"
+  //     },
+  //     {
+  //       "pagePath": "pages/chongzhi/index",
+  //       "iconPath": "static/tabbar/cz.png",
+  //       "selectedIconPath": "static/tabbar/cz-active.png",
+  //       "text": "充值"
+  //     },
+  //     {
+  //       "pagePath": "pages/tixian/index",
+  //       "iconPath": "static/tabbar/tx.png",
+  //       "selectedIconPath": "static/tabbar/tx-active.png",
+  //       "text": "提现"
+  //     },
+  //     {
+  //       "pagePath": "pages/mine/index",
+  //       "iconPath": "static/tabbar/wd.avif",
+  //       "selectedIconPath": "static/tabbar/wd-active.avif",
+  //       "text": "我的"
+  //     }
+  //   ]
+  // }
 }

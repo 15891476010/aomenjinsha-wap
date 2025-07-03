@@ -116,10 +116,13 @@
     </view>
     <wd-toast />
   </view>
+  <view class="h-70px" />
+  <TabbarCom />
 </template>
 
 <script setup lang="ts">
 import { onMounted, ref, computed } from "vue";
+import TabbarCom from "@/components/Tabbar";
 import { useUserStore } from "@/store/modules/user";
 import RechargeApi from "@/api/recharge";
 import { getIndexData } from "@/utils/auth";
@@ -184,6 +187,7 @@ onMounted(() => {
   margin: 0 auto;
   font-family: "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
   background: #f7f8fa;
+  animation: fadeIn 0.3s ease-out;
 }
 .header {
   position: relative;

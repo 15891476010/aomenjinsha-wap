@@ -4,8 +4,7 @@
     fixed
     :active-color="indexData.tabbar[0].choose_text_color"
     :inactive-color="indexData.tabbar[0].no_choose_text_color"
-    placeholder
-    safeAreaInsetBottom
+    :z-index="1000"
     class="tabbar-container"
     @change="handleChange"
   >

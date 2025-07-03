@@ -113,13 +113,14 @@
 
     <!-- 确认按钮 -->
     <button class="confirm-btn" @click="confirmWithdraw">确认</button>
-
-    <view style="height: 80px"></view>
   </view>
+  <view class="h-70px" />
+  <TabbarCom />
 </template>
 
 <script setup lang="ts">
 import { DictCodeEnum } from "@/enums/DictCodeEnum";
+import TabbarCom from "@/components/Tabbar";
 import DictAPI from "@/api/system/dict";
 import { onMounted, ref, watch } from "vue";
 

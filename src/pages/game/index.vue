@@ -299,7 +299,7 @@ onShow(() => {
 
 <style lang="scss" scoped>
 .layout {
-  height: calc(100vh - var(--status-bar-height) - 44px);
+  height: 100vh;
   overflow: hidden;
   background: #f8f8f8;
 
@@ -323,7 +323,7 @@ onShow(() => {
     .sidebar {
       flex-shrink: 0;
       width: 100px;
-      height: calc(100vh - var(--status-bar-height) - 105px);
+      height: calc(100vh - 60px);
       padding: 10rpx 0;
       overflow: scroll;
 
@@ -370,7 +370,7 @@ onShow(() => {
     .game-container {
       position: relative;
       flex: 1;
-      height: calc(100vh - var(--status-bar-height) - 150px);
+      height: calc(100vh - 100px);
       padding-left: 20rpx;
       overflow-x: hidden;
     }

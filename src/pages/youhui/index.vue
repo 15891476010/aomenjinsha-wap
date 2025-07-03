@@ -44,10 +44,13 @@
     </view>
     <!-- Toast组件 -->
     <wd-toast />
+    <view class="h-70px" />
+    <TabbarCom />
   </view>
 </template>
 
 <script setup lang="ts">
+import TabbarCom from "@/components/Tabbar";
 import FrontApi from "@/api/front/index";
 import { ref, onMounted } from "vue";
 import { useUserStore } from "@/store/modules/user";
@@ -101,6 +104,7 @@ onMounted(async () => {
 <style lang="scss">
 .youhui-container {
   position: relative;
+  animation: fadeIn 0.3s ease-out;
 
   // 高级朦胧效果 - 背景蒙版
   &::before {

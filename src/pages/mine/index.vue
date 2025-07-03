@@ -1,169 +1,275 @@
 <template>
-  <view class="mine-container">
-    <!-- 顶部渐变背景和光斑 -->
-    <view class="background-blur"></view>
-    <view class="background-spot spot1"></view>
-    <view class="background-spot spot2"></view>
-    <!-- 用户信息卡片玻璃拟态 -->
-    <view class="user-profile glass-card">
+  <view class="mine-page page-animation">
+    <!-- 顶部导航栏 -->
+    <view class="top-navbar">
+      <view class="navbar-item">
+        <wd-icon name="customer-service" size="20" color="#ffffff" />
+        <text>客服</text>
+      </view>
+      <view class="navbar-item">
+        <wd-icon name="notification" size="20" color="#ffffff" />
+        <text>消息</text>
+        <view class="notification-badge">50</view>
+      </view>
+      <view class="navbar-item" @click="navigateToProfile">
+        <wd-icon name="user-setting" size="20" color="#ffffff" />
+        <text>个人资料</text>
+      </view>
+    </view>
+
+    <!-- 用户信息区 -->
+    <view class="user-header">
       <view class="user-info">
-        <view class="avatar-container" @click="navigateToProfile">
-          <image
-            class="avatar avatar-glow"
-            :src="isLogin ? indexData.imagePrefix + userInfo!.avatar : defaultAvatar"
-            mode="aspectFill"
-          />
-          <view v-if="isLogin" class="vip-badge">VIP{{ userInfo!.vipLevel }}</view>
+        <view class="avatar-container">
+          <image class="avatar" :src="isLogin ? userAvatar : defaultAvatar" mode="aspectFill" />
         </view>
         <view class="user-details">
-          <block v-if="isLogin">
-            <view class="nickname">{{ userInfo!.nickName || "匿名用户" }}</view>
-            <view class="user-id">ID: {{ userInfo?.username || "0000000" }}</view>
-          </block>
-          <block v-else>
-            <view class="login-prompt">立即登录获取更多功能</view>
-            <wd-button
-              custom-class="btn-login glass-btn"
-              size="small"
-              type="primary"
-              @click="navigateToLoginPage"
-            >
-              登录/注册
-            </wd-button>
-          </block>
-        </view>
-        <view class="actions">
-          <view class="action-btn glass-card" @click="navigateToSettings">
-            <wd-icon name="setting1" size="22" color="#333" />
+          <view class="nickname">
+            {{ isLogin ? userInfo?.nickname || "zhang1086777" : "zhang1086777" }}
+            <wd-icon name="edit" size="16" color="#ffffff" />
           </view>
-          <view v-if="isLogin" class="action-btn glass-card" @click="navigateToSection('messages')">
-            <wd-icon name="notification" size="22" color="#333" />
-            <view v-if="true" class="badge">2</view>
+          <view class="user-id">
+            ID: {{ userInfo?.username || "464015851" }}
+            <wd-icon name="copy" size="16" color="#ffffff" />
+          </view>
+          <view class="user-level">
+            <image class="level-icon" src="/static/images/vip-icon.png" mode="aspectFill" />
+            <text>{{ "1.44" }}</text>
+            <wd-icon name="question-circle" size="16" color="#ffffff" />
           </view>
         </view>
       </view>
     </view>
 
-    <!-- 数据统计 -->
-    <view class="stats-container">
-      <view class="stat-item" @click="navigateToSection('wallet')">
-        <view class="stat-value">{{ userInfo?.balance }}</view>
-        <view class="stat-label">我的余额</view>
-      </view>
-      <view class="stat-item" @click="navigateToSection('wallet')">
-        <view class="stat-value">{{ userInfo!.betAmount }}</view>
-        <view class="stat-label">下注金额</view>
-      </view>
-    </view>
-
-    <!-- 常用工具 -->
-    <view class="card-container">
-      <view class="card-header">
-        <view class="card-title">
-          <wd-icon name="tools" size="18" :color="themeStore.primaryColor" />
-          <text>常用工具</text>
+    <!-- 功能按钮区 -->
+    <view class="function-buttons">
+      <view
+        v-for="(button, index) in functionButtons"
+        :key="index"
+        class="function-button"
+        @click="navigateToSection(button.section, button.subSection)"
+      >
+        <view :class="['icon-wrapper', button.colorClass]">
+          <wd-icon :name="button.icon" size="24" color="#ffffff" />
         </view>
-      </view>
-      <view class="tools-grid">
-        <view class="tool-item" @click="navigateToProfile">
-          <view class="tool-icon">
-            <wd-icon name="user" size="24" :color="themeStore.primaryColor" />
-          </view>
-          <view class="tool-label">个人资料</view>
-        </view>
-
-        <view class="tool-item" @click="navigateToFAQ">
-          <view class="tool-icon">
-            <wd-icon name="help-circle" size="24" :color="themeStore.primaryColor" />
-          </view>
-          <view class="tool-label">常见问题</view>
-        </view>
-        <view class="tool-item" @click="handleQuestionFeedback">
-          <view class="tool-icon">
-            <wd-icon name="check-circle" size="24" :color="themeStore.primaryColor" />
-          </view>
-          <view class="tool-label">问题反馈</view>
-        </view>
-        <view class="tool-item" @click="navigateToAbout">
-          <view class="tool-icon">
-            <wd-icon name="info-circle" size="24" :color="themeStore.primaryColor" />
-          </view>
-          <view class="tool-label">关于我们</view>
+        <text>{{ button.text }}</text>
+        <view v-if="button.badge" :class="['badge', button.badgeClass]">
+          {{ button.badgeValue }}
         </view>
       </view>
     </view>
 
-    <!-- 推荐服务 -->
-    <view class="card-container">
-      <view class="card-header">
-        <view class="card-title">
-          <wd-icon name="star" size="18" :color="themeStore.primaryColor" />
-          <text>推荐服务</text>
-        </view>
+    <!-- VIP信息区 -->
+    <view class="vip-info-card" @click="navigateToSection('vip')">
+      <view class="vip-left">
+        <wd-tag custom-class="vip-tag" type="danger">
+          VIP
+          <text>0</text>
+        </wd-tag>
+        <text class="vip-level">VIP 1</text>
       </view>
-      <view class="services-list">
-        <view class="service-item" @click="navigateToSection('services', 'vip')">
-          <view class="service-left">
-            <view class="service-icon">
-              <wd-icon name="dong" size="22" :color="themeStore.primaryColor" />
-            </view>
-            <view class="service-info">
-              <view class="service-name">会员中心</view>
-              <view class="service-desc">解锁更多特权</view>
-            </view>
-          </view>
-          <wd-icon name="arrow-right" size="14" color="#999" />
-        </view>
-        <view class="service-item" @click="navigateToSection('services', 'coupon')">
-          <view class="service-left">
-            <view class="service-icon">
-              <wd-icon name="discount" size="22" :color="themeStore.primaryColor" />
-            </view>
-            <view class="service-info">
-              <view class="service-name">优惠券</view>
-              <view class="service-desc">查看我的优惠券</view>
-            </view>
-          </view>
-          <wd-icon name="arrow-right" size="14" color="#999" />
-        </view>
-        <view class="service-item" @click="navigateToSection('services', 'invite')">
-          <view class="service-left">
-            <view class="service-icon">
-              <wd-icon name="share" size="22" :color="themeStore.primaryColor" />
-            </view>
-            <view class="service-info">
-              <view class="service-name">邀请有礼</view>
-              <view class="service-desc">邀请好友得奖励</view>
-            </view>
-          </view>
-          <wd-icon name="arrow-right" size="14" color="#999" />
-        </view>
+      <view class="vip-right">
+        <text class="vip-balance">在途资金: 1,985.10</text>
+        <wd-icon name="arrow-right" size="16" color="#ffffff" />
       </view>
     </view>
 
-    <view v-if="isLogin" class="logout-btn-container">
-      <wd-button custom-class="logout-btn-unocss" @click="handleLogout">退出登录</wd-button>
+    <!-- 资金信息区 -->
+    <view class="balance-info">
+      <view v-for="(item, index) in balanceItems" :key="index" class="balance-item">
+        <text class="balance-label">{{ item.label }}</text>
+        <view class="balance-progress">
+          <view class="progress-bar" :style="{ width: item.progressWidth }"></view>
+        </view>
+        <text class="balance-value">{{ item.value }}</text>
+      </view>
+    </view>
+
+    <!-- 菜单列表 -->
+    <view class="menu-list">
+      <view
+        v-for="(item, index) in menuItems"
+        :key="index"
+        class="menu-item"
+        @click="navigateToSection(item.section)"
+      >
+        <view :class="['menu-icon', item.iconColorClass]">
+          <wd-icon :name="item.icon" size="20" color="#ffffff" />
+        </view>
+        <text class="menu-text">{{ item.text }}</text>
+        <wd-icon name="arrow-right" size="16" color="#999999" />
+      </view>
+    </view>
+
+    <!-- 底部菜单 -->
+    <view class="bottom-menu">
+      <view
+        v-for="(item, index) in bottomMenuItems"
+        :key="index"
+        class="menu-item"
+        @click="navigateToSection(item.section)"
+      >
+        <view :class="['menu-icon', item.iconColorClass]">
+          <wd-icon :name="item.icon" size="20" color="#ffffff" />
+        </view>
+        <text class="menu-text">{{ item.text }}</text>
+        <text v-if="item.extraText" class="extra-text">{{ item.extraText }}</text>
+        <wd-icon name="arrow-right" size="16" color="#999999" />
+      </view>
     </view>
 
     <wd-toast />
+    <view class="h-70px" />
+    <TabbarCom />
   </view>
 </template>
 
 <script lang="ts" setup>
 import { useToast } from "wot-design-uni";
 import { useUserStore } from "@/store/modules/user";
-import { useThemeStore } from "@/store/modules/theme";
-import { computed } from "vue";
+import { computed, ref } from "vue";
+import TabbarCom from "@/components/Tabbar";
 
 import { getIndexData } from "@/utils/auth";
 const indexData = ref(getIndexData());
 
 const toast = useToast();
 const userStore = useUserStore();
-const themeStore = useThemeStore();
 const userInfo = computed(() => userStore.userInfo);
 const isLogin = computed(() => !!userInfo.value);
 const defaultAvatar = "/static/images/default-avatar.png";
+const userAvatar = computed(() =>
+  isLogin.value ? indexData.value.imagePrefix + userInfo.value?.avatar : defaultAvatar
+);
+
+// 功能按钮数组
+const functionButtons = ref([
+  {
+    text: "提现",
+    icon: "money-wallet",
+    colorClass: "blue",
+    section: "wallet",
+    subSection: "withdraw",
+  },
+  {
+    text: "充值",
+    icon: "add-circle",
+    colorClass: "orange",
+    section: "wallet",
+    subSection: "recharge",
+  },
+  {
+    text: "利息宝",
+    icon: "trending-up",
+    colorClass: "blue",
+    section: "wallet",
+    subSection: "interest",
+    badge: true,
+    badgeClass: "rate-badge",
+    badgeValue: "88.00%",
+  },
+  {
+    text: "公积金",
+    icon: "safe",
+    colorClass: "orange",
+    section: "wallet",
+    subSection: "fund",
+    badge: true,
+    badgeClass: "amount-badge",
+    badgeValue: "200.00",
+  },
+]);
+
+// 资金信息数组
+const balanceItems = ref([
+  {
+    label: "普通资金",
+    progressWidth: "100%",
+    value: "800,000.00",
+    percentage: 100,
+    color: "#34d399",
+  },
+  {
+    label: "普通资金",
+    progressWidth: "60%",
+    value: "3,014.90/5,000.00",
+    percentage: 60,
+    color: "#34d399",
+  },
+]);
+
+// 菜单列表数组
+const menuItems = ref([
+  {
+    text: "我的余额",
+    icon: "money-bag",
+    iconColorClass: "blue",
+    section: "balance",
+  },
+  {
+    text: "账户明细",
+    icon: "document-text",
+    iconColorClass: "orange",
+    section: "accountDetail",
+  },
+  {
+    text: "投注记录",
+    icon: "history",
+    iconColorClass: "green",
+    section: "betRecord",
+  },
+  {
+    text: "个人报表",
+    icon: "bar-chart",
+    iconColorClass: "blue",
+    section: "personalReport",
+  },
+  {
+    text: "提现管理",
+    icon: "money-withdraw",
+    iconColorClass: "red",
+    section: "withdrawManage",
+  },
+]);
+
+// 底部菜单数组
+const bottomMenuItems = ref([
+  {
+    text: "推广赚钱",
+    icon: "share",
+    iconColorClass: "blue",
+    section: "promotion",
+    extraText: "日进万元不是梦",
+  },
+  {
+    text: "个人资料",
+    icon: "user",
+    iconColorClass: "orange",
+    section: "profile",
+  },
+  {
+    text: "安全中心",
+    icon: "shield-check",
+    iconColorClass: "green",
+    section: "security",
+  },
+  {
+    text: "找到商门",
+    icon: "store",
+    iconColorClass: "purple",
+    section: "findStore",
+    extraText: "防止打不开",
+  },
+]);
+
+// 导航功能
+const navigateToCustomerService = () => {
+  toast.show("客服功能正在开发中...");
+};
+
+const navigateToMessages = () => {
+  toast.show("消息功能正在开发中...");
+};
 
 // 登录
 const navigateToLoginPage = () => {
@@ -176,20 +282,6 @@ const navigateToLoginPage = () => {
   });
 };
 
-// 退出登录
-const handleLogout = () => {
-  uni.showModal({
-    title: "提示",
-    content: "确认退出登录吗？",
-    success: function (res) {
-      if (res.confirm) {
-        userStore.logout();
-        toast.show("已退出登录");
-      }
-    },
-  });
-};
-
 // 个人信息
 const navigateToProfile = () => {
   if (!isLogin.value) {
@@ -199,75 +291,124 @@ const navigateToProfile = () => {
   uni.navigateTo({ url: "/pages/mine/profile/index" });
 };
 
-// 常见问题
-const navigateToFAQ = () => {
-  uni.navigateTo({ url: "/pages/mine/faq/index" });
-};
-
-// 关于我们
-const navigateToAbout = () => {
-  uni.navigateTo({ url: "/pages/mine/about/index" });
-};
-
-// 设置
-const navigateToSettings = () => {
-  uni.navigateTo({ url: "/pages/mine/settings/index" });
-};
-
-// 问题反馈
-const handleQuestionFeedback = () => {
-  uni.navigateTo({ url: "/pages/mine/feedback/index" });
-};
-
 // 导航到各个板块
 const navigateToSection = (section: string, subSection?: string) => {
-  if (!isLogin.value && section !== "services") {
+  if (
+    !isLogin.value &&
+    section !== "vip" &&
+    section !== "promotion" &&
+    section !== "security" &&
+    section !== "findStore"
+  ) {
     navigateToLoginPage();
     return;
   }
 
   const sections: Record<string, string> = {
-    messages: "消息中心",
-    todos: "待办事项",
-    favorites: "我的收藏",
-    history: "浏览历史",
-    wallet: "我的钱包",
-    orders: "我的订单",
-    address: "收货地址",
-    services: "增值服务",
+    vip: "VIP中心",
+    balance: "我的余额",
+    accountDetail: "账户明细",
+    betRecord: "投注记录",
+    personalReport: "个人报表",
+    withdrawManage: "提现管理",
+    wallet: "钱包管理",
+    promotion: "推广赚钱",
+    security: "安全中心",
+    findStore: "找到我们",
+    profile: "个人资料",
   };
 
-  let message = sections[section];
+  let message = sections[section] || section;
   if (subSection) {
-    message += ` - ${subSection}`;
+    const subSections: Record<string, string> = {
+      withdraw: "提现",
+      recharge: "充值",
+      interest: "利息宝",
+      fund: "公积金",
+    };
+
+    message += ` - ${subSections[subSection] || subSection}`;
   }
 
-  toast.show(`${message}功能开发中...`);
+  toast.show(`${message}功能正在开发中...`);
 };
 </script>
 
 <style lang="scss" scoped>
-/* stylelint-disable declaration-property-value-no-unknown */
-.mine-container {
+.mine-page {
   min-height: 100vh;
   padding-bottom: 100rpx;
-  background-color: #f5f7fa;
+  color: #fff;
+  background-color: #171725;
+}
+
+// 顶部导航栏
+.top-navbar {
+  display: flex;
+  justify-content: flex-end;
+  padding: 20rpx 30rpx;
+  background-color: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
+
+  .navbar-item {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-left: 40rpx;
+
+    text {
+      margin-top: 4rpx;
+      font-size: 22rpx;
+    }
+
+    .notification-badge {
+      position: absolute;
+      top: -8rpx;
+      right: -12rpx;
+      min-width: 32rpx;
+      height: 32rpx;
+      padding: 0 6rpx;
+      font-size: 20rpx;
+      line-height: 32rpx;
+      color: #fff;
+      text-align: center;
+      background: #f43f5e;
+      border-radius: 16rpx;
+      box-shadow: 0 2rpx 4rpx rgba(0, 0, 0, 0.2);
+    }
+  }
 }
 
 // 用户信息卡片
-.user-profile {
+.user-header {
   position: relative;
   padding: 30rpx;
   overflow: hidden;
+  background-color: rgba(30, 30, 46, 0.7);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 10rpx 30rpx rgba(0, 0, 0, 0.25);
 
-  .blur-bg {
+  &::before {
     position: absolute;
-    top: 0;
-    right: 0;
-    left: 0;
-    z-index: 0;
-    height: 240rpx;
-    background: linear-gradient(to bottom, var(--primary-color), var(--primary-color-light));
+    top: -100rpx;
+    right: -100rpx;
+    width: 300rpx;
+    height: 300rpx;
+    content: "";
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0) 70%);
+    border-radius: 50%;
+  }
+
+  &::after {
+    position: absolute;
+    bottom: -80rpx;
+    left: -80rpx;
+    width: 200rpx;
+    height: 200rpx;
+    content: "";
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0) 70%);
+    border-radius: 50%;
   }
 
   .user-info {
@@ -280,11 +421,11 @@ const navigateToSection = (section: string, subSection?: string) => {
       position: relative;
 
       .avatar {
-        width: 120rpx;
-        height: 120rpx;
-        border: 4rpx solid rgba(255, 255, 255, 0.8);
+        width: 96rpx;
+        height: 96rpx;
+        border: 3rpx solid rgba(255, 255, 255, 0.3);
         border-radius: 50%;
-        box-shadow: 0 6rpx 16rpx rgba(0, 0, 0, 0.1);
+        box-shadow: 0 8rpx 20rpx rgba(0, 0, 0, 0.2);
       }
     }
 
@@ -293,367 +434,391 @@ const navigateToSection = (section: string, subSection?: string) => {
       margin-left: 24rpx;
 
       .nickname {
+        display: flex;
+        align-items: center;
         margin-bottom: 8rpx;
-        font-size: 34rpx;
-        font-weight: bold;
+        font-size: 32rpx;
+        font-weight: 600;
         color: #fff;
+        text-shadow: 0 2rpx 4rpx rgba(0, 0, 0, 0.2);
+
+        .wd-icon {
+          margin-left: 8rpx;
+          opacity: 0.8;
+        }
       }
 
       .user-id {
-        font-size: 24rpx;
-        color: rgba(255, 255, 255, 0.8);
-      }
-
-      .login-prompt {
-        margin-bottom: 16rpx;
-        font-size: 28rpx;
-        color: #fff;
-      }
-    }
-
-    .actions {
-      display: flex;
-
-      .action-btn {
-        position: relative;
         display: flex;
         align-items: center;
-        justify-content: center;
-        width: 70rpx;
-        height: 70rpx;
-        margin-left: 16rpx;
-        background-color: rgba(255, 255, 255, 0.9);
-        border-radius: 50%;
-        box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.05);
+        margin-bottom: 8rpx;
+        font-size: 24rpx;
+        color: rgba(255, 255, 255, 0.8);
 
-        .badge {
-          position: absolute;
-          top: -6rpx;
-          right: -6rpx;
-          z-index: 2;
-          min-width: 32rpx;
-          height: 32rpx;
-          padding: 0 6rpx;
-          font-size: 20rpx;
-          line-height: 32rpx;
-          color: #fff;
-          text-align: center;
-          background-color: #ff4d4f;
-          border: 2rpx solid #fff;
-          border-radius: 16rpx;
+        .wd-icon {
+          margin-left: 8rpx;
+          opacity: 0.6;
+        }
+      }
+
+      .user-level {
+        display: flex;
+        align-items: center;
+
+        .level-icon {
+          width: 28rpx;
+          height: 28rpx;
+          margin-right: 8rpx;
+        }
+
+        text {
+          font-size: 24rpx;
+          font-weight: 500;
+          color: rgba(255, 255, 255, 0.9);
+        }
+
+        .wd-icon {
+          margin-left: 8rpx;
+          opacity: 0.6;
         }
       }
     }
   }
 }
 
-// 数据统计
-.stats-container {
+// 功能按钮区
+.function-buttons {
+  position: relative;
+  z-index: 10;
   display: flex;
-  padding: 30rpx 20rpx;
-  margin: 20rpx 30rpx;
-  background: #fff;
-  border-radius: 16rpx;
-  box-shadow: 0 6rpx 16rpx rgba(0, 0, 0, 0.04);
+  justify-content: space-between;
+  padding: 20rpx 10rpx;
+  margin: 0;
+  background-color: rgba(30, 30, 46, 0.7);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 10rpx 30rpx rgba(0, 0, 0, 0.1);
 
-  .stat-item {
+  .function-button {
+    position: relative;
     display: flex;
     flex: 1;
     flex-direction: column;
     align-items: center;
+    padding: 15rpx 0;
 
-    .stat-value {
-      margin-bottom: 8rpx;
-      font-size: 36rpx;
-      font-weight: 600;
-      color: #333;
-    }
-
-    .stat-label {
-      font-size: 26rpx;
-      color: #666;
-    }
-  }
-
-  .divider {
-    width: 1px;
-    margin: 0 20rpx;
-    background-color: #eee;
-  }
-}
-
-// 卡片容器通用样式
-.card-container {
-  margin: 24rpx 30rpx;
-  overflow: hidden;
-  background: #fff;
-  border-radius: 16rpx;
-  box-shadow: 0 6rpx 16rpx rgba(0, 0, 0, 0.04);
-
-  .card-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 20rpx 24rpx;
-    border-bottom: 1rpx solid #f5f5f5;
-
-    .card-title {
-      display: flex;
-      align-items: center;
-
-      text {
-        margin-left: 12rpx;
-        font-size: 28rpx;
-        font-weight: 600;
-        color: #333;
-      }
-    }
-
-    .card-action {
-      display: flex;
-      align-items: center;
-
-      text {
-        margin-right: 8rpx;
-        font-size: 24rpx;
-        color: #999;
-      }
-    }
-  }
-}
-
-// 订单状态
-.order-status {
-  display: flex;
-  padding: 30rpx 0 20rpx;
-
-  .status-item {
-    display: flex;
-    flex: 1;
-    flex-direction: column;
-    align-items: center;
-
-    .status-icon {
-      position: relative;
+    .icon-wrapper {
       display: flex;
       align-items: center;
       justify-content: center;
       width: 80rpx;
       height: 80rpx;
       margin-bottom: 12rpx;
+      border-radius: 50%;
+      box-shadow: 0 8rpx 16rpx rgba(0, 0, 0, 0.2);
 
-      .status-badge {
-        position: absolute;
-        top: -10rpx;
-        right: -10rpx;
-        z-index: 2;
-        min-width: 32rpx;
-        height: 32rpx;
-        padding: 0 6rpx;
-        font-size: 20rpx;
-        line-height: 32rpx;
-        color: #fff;
-        text-align: center;
-        background-color: #ff4d4f;
-        border-radius: 16rpx;
+      &.blue {
+        background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
+      }
+
+      &.orange {
+        background: linear-gradient(135deg, #ea580c 0%, #f97316 100%);
       }
     }
 
-    .status-label {
+    text {
       font-size: 24rpx;
-      color: #666;
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .badge {
+      position: absolute;
+      top: -5rpx;
+      right: 10rpx;
+      padding: 4rpx 12rpx;
+      font-size: 20rpx;
+      font-weight: bold;
+      color: #fff;
+      border-radius: 20rpx;
+      box-shadow: 0 4rpx 8rpx rgba(0, 0, 0, 0.3);
+      transform: scale(0.9);
+    }
+
+    .rate-badge {
+      background: linear-gradient(90deg, #dc2626, #ef4444);
+    }
+
+    .amount-badge {
+      background: linear-gradient(90deg, #ea580c, #f97316);
     }
   }
 }
 
-// 工具网格
-.tools-grid {
+// VIP信息区
+.vip-info-card {
+  position: relative;
   display: flex;
-  flex-wrap: wrap;
-  padding: 20rpx 0 10rpx;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24rpx 30rpx;
+  margin: 20rpx 20rpx 0;
+  overflow: hidden;
+  color: #fff;
+  background: #1a73e8;
+  border-radius: 16rpx 16rpx 0 0;
+  box-shadow: 0 10rpx 20rpx rgba(0, 0, 0, 0.25);
 
-  .tool-item {
+  .vip-left {
     display: flex;
-    flex-direction: column;
     align-items: center;
-    width: 25%;
-    margin-bottom: 30rpx;
+  }
 
-    .tool-icon {
+  .vip-tag {
+    display: flex !important;
+    align-items: center;
+    height: 40rpx;
+    padding: 0 14rpx;
+    margin-right: 16rpx;
+    font-size: 24rpx;
+    font-weight: bold;
+    color: #fff !important;
+    background-color: #f43f5e !important;
+    border-radius: 8rpx;
+    box-shadow: 0 4rpx 8rpx rgba(0, 0, 0, 0.1);
+
+    text {
+      margin-left: 2rpx;
+    }
+  }
+
+  .vip-level {
+    font-size: 30rpx;
+    font-weight: bold;
+    color: #fff;
+    text-shadow: 0 2rpx 4rpx rgba(0, 0, 0, 0.1);
+  }
+
+  .vip-right {
+    display: flex;
+    align-items: center;
+  }
+
+  .vip-balance {
+    margin-right: 12rpx;
+    font-size: 26rpx;
+    font-weight: 500;
+  }
+}
+
+// 资金信息区
+.balance-info {
+  padding: 12rpx 0;
+  margin: 0 20rpx 20rpx;
+  background-color: #1a73e8;
+  border-radius: 0 0 16rpx 16rpx;
+
+  .balance-item {
+    display: flex;
+    align-items: center;
+    padding: 12rpx 30rpx;
+
+    &:last-child {
+      padding-bottom: 24rpx;
+    }
+
+    .balance-label {
       display: flex;
       align-items: center;
-      justify-content: center;
-      width: 90rpx;
-      height: 90rpx;
-      margin-bottom: 12rpx;
-      background-color: rgba(var(--primary-color-rgb), 0.08);
-      border-radius: 18rpx;
-      transition: transform 0.2s;
+      width: 160rpx;
+      font-size: 24rpx;
+      color: rgba(255, 255, 255, 0.9);
 
-      &:active {
-        transform: scale(0.95);
+      &::before {
+        display: inline-block;
+        width: 6rpx;
+        height: 6rpx;
+        margin-right: 6rpx;
+        content: "";
+        background: #fff;
+        border-radius: 50%;
       }
     }
 
-    .tool-label {
-      font-size: 24rpx;
-      color: #555;
+    .balance-progress {
+      flex: 1;
+      height: 12rpx;
+      margin-right: 20rpx;
+      overflow: hidden;
+      background-color: rgba(255, 255, 255, 0.2);
+      border-radius: 6rpx;
+
+      .progress-bar {
+        height: 100%;
+        background: #34d399;
+        border-radius: 6rpx;
+      }
+    }
+
+    .balance-value {
+      font-size: 26rpx;
+      font-weight: bold;
+      color: #fff;
+      white-space: nowrap;
     }
   }
 }
 
-// 服务列表
-.services-list {
-  .service-item {
+// 菜单列表
+.menu-list {
+  padding: 0;
+  margin: 20rpx 20rpx;
+  overflow: hidden;
+  background-color: rgba(30, 30, 46, 0.7);
+  backdrop-filter: blur(10px);
+  border-radius: 16rpx;
+  box-shadow: 0 10rpx 30rpx rgba(0, 0, 0, 0.15);
+
+  .menu-item {
+    position: relative;
     display: flex;
     align-items: center;
-    justify-content: space-between;
     padding: 30rpx 24rpx;
-    border-bottom: 1rpx solid #f5f5f5;
+    border-bottom: 1rpx solid rgba(255, 255, 255, 0.08);
 
     &:last-child {
       border-bottom: none;
     }
 
-    .service-left {
+    .menu-icon {
       display: flex;
       align-items: center;
+      justify-content: center;
+      width: 56rpx;
+      height: 56rpx;
+      margin-right: 20rpx;
+      border-radius: 12rpx;
+      box-shadow: 0 6rpx 12rpx rgba(0, 0, 0, 0.2);
 
-      .service-icon {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 70rpx;
-        height: 70rpx;
-        background-color: rgba(var(--primary-color-rgb), 0.08);
-        border-radius: 16rpx;
+      &.blue {
+        background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
       }
 
-      .service-info {
-        margin-left: 20rpx;
-
-        .service-name {
-          margin-bottom: 6rpx;
-          font-size: 28rpx;
-          font-weight: 500;
-          color: #333;
-        }
-
-        .service-desc {
-          font-size: 24rpx;
-          color: #999;
-        }
+      &.orange {
+        background: linear-gradient(135deg, #ea580c 0%, #f97316 100%);
       }
+
+      &.green {
+        background: linear-gradient(135deg, #16a34a 0%, #22c55e 100%);
+      }
+
+      &.red {
+        background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+      }
+
+      &.purple {
+        background: linear-gradient(135deg, #7e22ce 0%, #a855f7 100%);
+      }
+    }
+
+    .menu-text {
+      flex: 1;
+      font-size: 28rpx;
+      color: rgba(255, 255, 255, 0.9);
     }
   }
 }
 
-// 退出登录按钮
-.logout-btn-container {
-  margin: 60rpx 30rpx;
-}
-
-.mine-container {
-  position: relative;
-  min-height: 100vh;
-  padding-bottom: 100rpx;
+// 底部菜单
+.bottom-menu {
+  padding: 0;
+  margin: 20rpx 20rpx;
   overflow: hidden;
-  background: linear-gradient(135deg, #6a85f1 0%, #b8e994 100%);
-}
-.background-blur {
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 0;
-  width: 100vw;
-  height: 320rpx;
-  background: linear-gradient(120deg, rgba(106, 133, 241, 0.7) 0%, rgba(184, 233, 148, 0.5) 100%);
-  filter: blur(32rpx);
-}
-.background-spot {
-  position: absolute;
-  z-index: 0;
-  filter: blur(48rpx);
-  border-radius: 50%;
-  opacity: 0.5;
-}
-.spot1 {
-  top: 60rpx;
-  left: 10vw;
-  width: 180rpx;
-  height: 180rpx;
-  background: #b8e994;
-}
-.spot2 {
-  top: 120rpx;
-  right: 8vw;
-  width: 220rpx;
-  height: 220rpx;
-  background: #6a85f1;
-}
-// 玻璃卡片
-.glass-card {
-  background: rgba(255, 255, 255, 0.18);
-  backdrop-filter: blur(16px);
-  border: 1rpx solid rgba(255, 255, 255, 0.24);
-  border-radius: 24rpx;
-  box-shadow: 0 8rpx 32rpx 0 rgba(31, 38, 135, 0.18);
-}
-// 玻璃按钮
-.glass-btn {
-  background: rgba(255, 255, 255, 0.22) !important;
-  backdrop-filter: blur(8px) !important;
-  border: 1rpx solid rgba(255, 255, 255, 0.32) !important;
-  box-shadow: 0 2rpx 8rpx rgba(106, 133, 241, 0.08) !important;
-  transition: transform 0.2s;
-  &:active {
-    transform: scale(0.96);
+  background-color: rgba(30, 30, 46, 0.7);
+  backdrop-filter: blur(10px);
+  border-radius: 16rpx;
+  box-shadow: 0 10rpx 30rpx rgba(0, 0, 0, 0.15);
+
+  .menu-item {
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding: 30rpx 24rpx;
+    border-bottom: 1rpx solid rgba(255, 255, 255, 0.08);
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    .menu-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 56rpx;
+      height: 56rpx;
+      margin-right: 20rpx;
+      border-radius: 12rpx;
+      box-shadow: 0 6rpx 12rpx rgba(0, 0, 0, 0.2);
+
+      &.blue {
+        background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
+      }
+
+      &.orange {
+        background: linear-gradient(135deg, #ea580c 0%, #f97316 100%);
+      }
+
+      &.green {
+        background: linear-gradient(135deg, #16a34a 0%, #22c55e 100%);
+      }
+
+      &.purple {
+        background: linear-gradient(135deg, #7e22ce 0%, #a855f7 100%);
+      }
+    }
+
+    .menu-text {
+      flex: 1;
+      font-size: 28rpx;
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .extra-text {
+      margin-right: 15rpx;
+      font-size: 24rpx;
+      color: #3b82f6;
+    }
   }
 }
-// 头像发光
-.avatar-glow {
-  border: 4rpx solid rgba(255, 255, 255, 0.7);
-  box-shadow: 0 0 32rpx 8rpx rgba(106, 133, 241, 0.5);
+
+/* 页面动画 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20rpx);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
-// VIP徽章
-.vip-badge {
-  position: absolute;
-  right: -24rpx;
-  bottom: 0;
-  padding: 4rpx 18rpx;
-  font-size: 22rpx;
-  font-weight: bold;
-  color: #fff;
-  background: linear-gradient(90deg, #ffd700 0%, #ffb300 100%);
-  border-radius: 24rpx;
-  box-shadow: 0 2rpx 8rpx rgba(255, 215, 0, 0.18);
+
+.page-animation {
+  animation: fadeIn 0.3s ease-out;
 }
 </style>
 
 <style>
-/* 使用全局样式解决微信小程序组件样式问题 */
-.logout-btn-unocss {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  width: 100% !important;
-  height: 80rpx !important;
-  font-size: 32rpx !important;
-  font-weight: bold !important;
-  color: #fff !important;
-  background-color: var(--primary-color) !important;
-  border: 2rpx solid var(--primary-color) !important;
-  border-radius: 40rpx !important;
-  box-shadow: 0 4rpx 12rpx rgba(var(--primary-color-rgb), 0.3) !important;
+/* 全局样式 */
+page {
+  color: #ffffff;
+  background-color: #171725;
 }
 
-.btn-login {
-  width: 160rpx !important;
-  height: 60rpx !important;
-  font-size: 26rpx !important;
-  color: var(--primary-color) !important;
-  background-color: #fff !important;
+/* wot-design-uni标签样式覆盖 */
+.wd-tag {
+  height: 40rpx !important;
+  padding: 0 14rpx !important;
+  font-size: 24rpx !important;
+  line-height: 40rpx !important;
   border: none !important;
-  border-radius: 30rpx !important;
 }
 </style>

@@ -54,6 +54,8 @@
       <TargetUrlCom />
       <GameIndexCom />
     </view>
+    <view class="h-70px" />
+    <TabbarCom />
   </view>
 </template>
 
@@ -62,6 +64,7 @@ import SwiperCom from "@/pages/index/components/Swiper";
 import NoticeBarCom from "@/pages/index/components/NoticeBar";
 import TargetUrlCom from "@/pages/index/components/TargetUrl";
 import GameIndexCom from "@/pages/index/components/GameIndex";
+import TabbarCom from "@/components/Tabbar";
 import { getIndexData } from "@/utils/auth";
 import { useGameStore } from "@/store";
 import { onPullDownRefresh, onShow } from "@dcloudio/uni-app";
@@ -108,6 +111,7 @@ onPullDownRefresh(() => {
 .layout {
   width: 100vw;
   overflow: hidden;
+  animation: fadeIn 0.3s ease-out;
 
   .custom-navbar {
     position: fixed;

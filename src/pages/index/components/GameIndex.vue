@@ -69,6 +69,7 @@ import PublicApi, { GamePageQuery } from "@/api/public";
 import GameApi from "@/api/game";
 import { getIndexData } from "@/utils/auth";
 import { setGameData } from "@/utils/cache";
+import { onLoad } from "@dcloudio/uni-app";
 const indexData = ref(getIndexData());
 
 const querParams: GamePageQuery = {
@@ -197,7 +198,6 @@ async function handleGameClick(game: any) {
 
 // 查看更多游戏
 function navigateToMore(categoryId: number | string, game: any) {
-  console.log(game);
   if (!game.gameCode) {
     const str = game ? `&platTypeId=${game.id}` : "";
     uni.navigateTo({
@@ -213,7 +213,7 @@ function navigateToMore(categoryId: number | string, game: any) {
   }
 }
 
-onMounted(() => {
+onLoad(() => {
   getGameList().then(() => {
     // 设置默认激活的标签为第一个分类
     if (gameCategories.value.length > 0) {
