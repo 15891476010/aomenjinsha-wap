@@ -46,14 +46,20 @@ function handleChange() {
     // 获取当前页面路径
     const pages = getCurrentPages();
     const currentRoute = pages[pages.length - 1].route;
-    console.log(currentRoute);
+
     // 去掉 target_url 前面的斜杠
-    const targetRoute = item.target_url.replace(/^\//, "");
+    const targetRoute = item.target_url;
     if (currentRoute === targetRoute) {
       return;
     }
-    uni.navigateTo({
-      url: item.target_url,
+    // 处理路径格式，确保以/开头
+    let url = item.target_url;
+    if (!url.startsWith("/")) {
+      url = "/" + url;
+    }
+
+    uni.redirectTo({
+      url: url,
     });
   }
 }
@@ -63,7 +69,7 @@ onMounted(() => {
   const currentRoute = pages[pages.length - 1].route;
   // 遍历tabbar，找到匹配的index
   const index = indexData.value.tabbar.findIndex(
-    (item: any) => item.target_url && item.target_url.replace(/^\//, "") === currentRoute
+    (item: any) => item.target_url && item.target_url === currentRoute
   );
   if (index !== -1) {
     tabbar.value = index;

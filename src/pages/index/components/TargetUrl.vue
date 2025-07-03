@@ -3,7 +3,7 @@
   <wd-card type="rectangle">
     <template #title>
       <view class="title-row">
-        <template v-if="isLogin">
+        <template v-if="userInfo">
           <image
             v-if="userInfo.avatar"
             :src="indexData.imagePrefix + userInfo.avatar"
@@ -59,18 +59,13 @@
 
 <script setup lang="ts">
 import { getIndexData } from "@/utils/auth";
-import { ref, computed } from "vue";
+import { ref, onMounted } from "vue";
 const indexData = ref(getIndexData());
 const targetGrid = ref(indexData.value.targetUrl);
 import { useUserStore } from "@/store/modules/user";
 import { onLoad } from "@dcloudio/uni-app";
-const isSecret = import.meta.env.VITE_APP_ENCRYPTION === "true";
 const userStore = useUserStore();
 const userInfo = ref<any>(userStore.userInfo);
-
-const isLogin = computed(() => {
-  return isSecret ? userInfo.value : userInfo.value && userInfo.value.username;
-});
 
 function handleClick(item: any) {
   console.log(item);
@@ -81,13 +76,16 @@ async function refreshUserInfo() {
 }
 
 async function goLogin() {
-  uni.reLaunch({
+  uni.navigateTo({
     url: "/pages/login/index",
   });
 }
 
 onLoad(async () => {
   // await refreshUserInfo();
+});
+onMounted(async () => {
+  await refreshUserInfo();
 });
 </script>
 

@@ -65,6 +65,7 @@
 </template>
 
 <script setup lang="ts">
+import { ref } from "vue";
 import PublicApi, { GamePageQuery } from "@/api/public";
 import GameApi from "@/api/game";
 import { getIndexData } from "@/utils/auth";
@@ -84,7 +85,7 @@ const querParams: GamePageQuery = {
 };
 
 // 游戏分类数据
-const gameCategories = ref([]);
+const gameCategories = ref<any>([]);
 
 // 当前激活的标签
 const activeTab = ref("");
@@ -223,11 +224,6 @@ onLoad(() => {
     // 添加滚动监听
     window.addEventListener("scroll", handleScroll);
   });
-});
-
-// 组件卸载时移除滚动监听
-onUnmounted(() => {
-  window.removeEventListener("scroll", handleScroll);
 });
 </script>
 

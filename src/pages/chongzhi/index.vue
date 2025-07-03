@@ -3,8 +3,10 @@
     <!-- 顶部栏 -->
     <view class="header">
       <view class="user-info">
-        <text class="user-name">{{ userInfo.nickName }}</text>
-        <text class="balance">余额: {{ userInfo.balance }} RMB</text>
+        <text class="user-name">
+          {{ userInfo && userInfo.username ? userInfo.username : "未登录" }}
+        </text>
+        <text class="balance">余额: {{ userInfo ? userInfo.balance : 0.0 }} RMB</text>
       </view>
       <text class="title">线上存款</text>
     </view>

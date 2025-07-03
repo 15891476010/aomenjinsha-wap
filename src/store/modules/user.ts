@@ -2,11 +2,14 @@ import { ref } from "vue";
 import { defineStore } from "pinia";
 import AuthAPI, { type LoginFormData } from "@/api/auth";
 import UserAPI, { type UserInfo } from "@/api/system/user";
-import { setToken, getUserInfo, setUserInfo, clearAll } from "@/utils/cache";
+import { setToken, getUserInfo, setUserInfo, clearAll, getToken } from "@/utils/cache";
+const isSecret = import.meta.env.VITE_APP_ENCRYPTION === "true";
 
 export const useUserStore = defineStore("user", () => {
   const userInfo = ref<UserInfo | undefined>(getUserInfo());
-
+  const isLogin = () => {
+    return isSecret ? userInfo.value : userInfo.value && userInfo.value.username;
+  };
   // 登录
   const login = (data: LoginFormData) => {
     return new Promise((resolve, reject) => {
@@ -40,16 +43,22 @@ export const useUserStore = defineStore("user", () => {
   // 获取用户信息
   const getInfo = () => {
     return new Promise((resolve, reject) => {
-      UserAPI.getUserInfo()
-        .then((data) => {
-          setUserInfo(data);
-          userInfo.value = data;
-          resolve(data);
-        })
-        .catch((error) => {
-          console.error("获取用户信息失败", error);
-          reject(error);
+      if (isLogin() || getToken()) {
+        UserAPI.checkLoginApi().then((data: any) => {
+          if (data) {
+            UserAPI.getUserInfo()
+              .then((data) => {
+                setUserInfo(data);
+                userInfo.value = data;
+                resolve(data);
+              })
+              .catch((error) => {
+                console.error("获取用户信息失败", error);
+                reject(error);
+              });
+          }
         });
+      }
     });
   };
 

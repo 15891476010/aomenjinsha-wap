@@ -1,41 +1,44 @@
 <template>
   <view class="mine-page page-animation">
     <!-- 顶部导航栏 -->
-    <view class="top-navbar">
+    <view class="top-navbar" :style="{ paddingTop: statusBarHeight + 'px' }">
       <view class="navbar-item">
-        <wd-icon name="customer-service" size="20" color="#ffffff" />
+        <wd-icon name="dong" size="20" color="#666666" />
         <text>客服</text>
       </view>
       <view class="navbar-item">
-        <wd-icon name="notification" size="20" color="#ffffff" />
+        <wd-icon name="notification" size="20" color="#666666" />
         <text>消息</text>
         <view class="notification-badge">50</view>
       </view>
       <view class="navbar-item" @click="navigateToProfile">
-        <wd-icon name="user-setting" size="20" color="#ffffff" />
+        <wd-icon name="note" size="20" color="#666666" />
         <text>个人资料</text>
       </view>
+    </view>
+
+    <!-- 开发调试信息 -->
+    <view v-if="isDev" class="debug-info">
+      <text>状态栏高度: {{ statusBarHeight }}px</text>
     </view>
 
     <!-- 用户信息区 -->
     <view class="user-header">
       <view class="user-info">
         <view class="avatar-container">
-          <image class="avatar" :src="isLogin ? userAvatar : defaultAvatar" mode="aspectFill" />
+          <image class="avatar" :src="userAvatar ? userAvatar : defaultAvatar" mode="aspectFill" />
         </view>
         <view class="user-details">
           <view class="nickname">
-            {{ isLogin ? userInfo?.nickname || "zhang1086777" : "zhang1086777" }}
-            <wd-icon name="edit" size="16" color="#ffffff" />
-          </view>
-          <view class="user-id">
-            ID: {{ userInfo?.username || "464015851" }}
-            <wd-icon name="copy" size="16" color="#ffffff" />
+            <text v-if="userInfo?.username">{{ userInfo?.username }}</text>
+            <wd-button v-else type="primary" size="small" @click="goLogin">登录/注册</wd-button>
           </view>
           <view class="user-level">
-            <image class="level-icon" src="/static/images/vip-icon.png" mode="aspectFill" />
-            <text>{{ "1.44" }}</text>
-            <wd-icon name="question-circle" size="16" color="#ffffff" />
+            <image class="level-icon" src="/static/icons/CNY.avif" mode="aspectFill" />
+            <text>
+              {{ userInfo?.balance ? userInfo?.balance || userInfo?.balance : "0.00" }} CNY
+            </text>
+            <wd-icon name="question-circle" size="16" color="#666666" />
           </view>
         </view>
       </view>
@@ -66,10 +69,14 @@
           VIP
           <text>0</text>
         </wd-tag>
-        <text class="vip-level">VIP 1</text>
       </view>
       <view class="vip-right">
-        <text class="vip-balance">在途资金: 1,985.10</text>
+        <view class="vip-balance">
+          距离
+          <span class="vip-balance-text">VIP 1</span>
+          还需投注
+          <span class="vip-balance-text">1000</span>
+        </view>
         <wd-icon name="arrow-right" size="16" color="#ffffff" />
       </view>
     </view>
@@ -80,8 +87,8 @@
         <text class="balance-label">{{ item.label }}</text>
         <view class="balance-progress">
           <view class="progress-bar" :style="{ width: item.progressWidth }"></view>
+          <text class="balance-value">{{ item.value }}</text>
         </view>
-        <text class="balance-value">{{ item.value }}</text>
       </view>
     </view>
 
@@ -127,7 +134,7 @@
 <script lang="ts" setup>
 import { useToast } from "wot-design-uni";
 import { useUserStore } from "@/store/modules/user";
-import { computed, ref } from "vue";
+import { computed, ref, onMounted } from "vue";
 import TabbarCom from "@/components/Tabbar";
 
 import { getIndexData } from "@/utils/auth";
@@ -135,12 +142,22 @@ const indexData = ref(getIndexData());
 
 const toast = useToast();
 const userStore = useUserStore();
-const userInfo = computed(() => userStore.userInfo);
-const isLogin = computed(() => !!userInfo.value);
+const userInfo = ref(userStore.userInfo);
 const defaultAvatar = "/static/images/default-avatar.png";
 const userAvatar = computed(() =>
-  isLogin.value ? indexData.value.imagePrefix + userInfo.value?.avatar : defaultAvatar
+  userInfo.value?.avatar ? indexData.value.imagePrefix + userInfo.value?.avatar : defaultAvatar
 );
+
+// 获取状态栏高度
+const statusBarHeight = ref(0);
+// 是否显示调试信息
+const isDev = ref(true);
+onMounted(async () => {
+  const systemInfo = uni.getSystemInfoSync();
+  statusBarHeight.value = systemInfo.statusBarHeight || 0;
+  const res = await userStore.getInfo();
+  userInfo.value = res as any;
+});
 
 // 功能按钮数组
 const functionButtons = ref([
@@ -183,14 +200,14 @@ const functionButtons = ref([
 // 资金信息数组
 const balanceItems = ref([
   {
-    label: "普通资金",
+    label: "晋级再充值",
     progressWidth: "100%",
     value: "800,000.00",
     percentage: 100,
     color: "#34d399",
   },
   {
-    label: "普通资金",
+    label: "晋级再投注",
     progressWidth: "60%",
     value: "3,014.90/5,000.00",
     percentage: 60,
@@ -254,11 +271,17 @@ const bottomMenuItems = ref([
     section: "security",
   },
   {
-    text: "找到商门",
+    text: "找到我们",
     icon: "store",
     iconColorClass: "purple",
     section: "findStore",
     extraText: "防止打不开",
+  },
+  {
+    text: "安全退出",
+    icon: "back",
+    iconColorClass: "purple",
+    section: "safeLogout",
   },
 ]);
 
@@ -284,7 +307,7 @@ const navigateToLoginPage = () => {
 
 // 个人信息
 const navigateToProfile = () => {
-  if (!isLogin.value) {
+  if (!userInfo.value) {
     navigateToLoginPage();
     return;
   }
@@ -293,8 +316,12 @@ const navigateToProfile = () => {
 
 // 导航到各个板块
 const navigateToSection = (section: string, subSection?: string) => {
+  if (section === "safeLogout") {
+    navigateToSafeLogout();
+    return;
+  }
   if (
-    !isLogin.value &&
+    !userInfo.value &&
     section !== "vip" &&
     section !== "promotion" &&
     section !== "security" &&
@@ -316,6 +343,7 @@ const navigateToSection = (section: string, subSection?: string) => {
     security: "安全中心",
     findStore: "找到我们",
     profile: "个人资料",
+    safeLogout: "安全退出",
   };
 
   let message = sections[section] || section;
@@ -332,23 +360,48 @@ const navigateToSection = (section: string, subSection?: string) => {
 
   toast.show(`${message}功能正在开发中...`);
 };
+
+async function goLogin() {
+  uni.navigateTo({
+    url: "/pages/login/index",
+  });
+}
+
+// 安全退出
+const navigateToSafeLogout = () => {
+  // 确认弹窗
+  uni.showModal({
+    title: "安全退出",
+    content: "确定要安全退出吗？",
+    success: (res) => {
+      if (res.confirm) {
+        userStore.logout();
+        // 刷新当前页面
+        uni.reLaunch({ url: "/pages/mine/index" });
+      }
+    },
+  });
+};
 </script>
 
 <style lang="scss" scoped>
 .mine-page {
   min-height: 100vh;
   padding-bottom: 100rpx;
-  color: #fff;
-  background-color: #171725;
+  color: #333333;
+  background-color: #f5f7fa;
 }
 
 // 顶部导航栏
 .top-navbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
   display: flex;
   justify-content: flex-end;
   padding: 20rpx 30rpx;
-  background-color: rgba(0, 0, 0, 0.3);
-  backdrop-filter: blur(10px);
+  background-color: #ffffff;
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.05);
 
   .navbar-item {
     position: relative;
@@ -360,6 +413,7 @@ const navigateToSection = (section: string, subSection?: string) => {
     text {
       margin-top: 4rpx;
       font-size: 22rpx;
+      color: #666666;
     }
 
     .notification-badge {
@@ -380,14 +434,25 @@ const navigateToSection = (section: string, subSection?: string) => {
   }
 }
 
+// 调试信息
+.debug-info {
+  padding: 10rpx 20rpx;
+  margin: 10rpx 20rpx;
+  font-size: 24rpx;
+  color: #666666;
+  background-color: rgba(0, 0, 0, 0.05);
+  border-radius: 10rpx;
+}
+
 // 用户信息卡片
 .user-header {
   position: relative;
   padding: 30rpx;
+  margin: 20rpx;
   overflow: hidden;
-  background-color: rgba(30, 30, 46, 0.7);
-  backdrop-filter: blur(10px);
-  box-shadow: 0 10rpx 30rpx rgba(0, 0, 0, 0.25);
+  background-color: #ffffff;
+  border-radius: 16rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.08);
 
   &::before {
     position: absolute;
@@ -396,7 +461,7 @@ const navigateToSection = (section: string, subSection?: string) => {
     width: 300rpx;
     height: 300rpx;
     content: "";
-    background: radial-gradient(circle, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0) 70%);
+    background: radial-gradient(circle, rgba(0, 0, 0, 0.03) 0%, rgba(0, 0, 0, 0) 70%);
     border-radius: 50%;
   }
 
@@ -407,7 +472,7 @@ const navigateToSection = (section: string, subSection?: string) => {
     width: 200rpx;
     height: 200rpx;
     content: "";
-    background: radial-gradient(circle, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0) 70%);
+    background: radial-gradient(circle, rgba(0, 0, 0, 0.02) 0%, rgba(0, 0, 0, 0) 70%);
     border-radius: 50%;
   }
 
@@ -423,9 +488,9 @@ const navigateToSection = (section: string, subSection?: string) => {
       .avatar {
         width: 96rpx;
         height: 96rpx;
-        border: 3rpx solid rgba(255, 255, 255, 0.3);
+        border: 3rpx solid rgba(0, 0, 0, 0.1);
         border-radius: 50%;
-        box-shadow: 0 8rpx 20rpx rgba(0, 0, 0, 0.2);
+        box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.1);
       }
     }
 
@@ -439,12 +504,11 @@ const navigateToSection = (section: string, subSection?: string) => {
         margin-bottom: 8rpx;
         font-size: 32rpx;
         font-weight: 600;
-        color: #fff;
-        text-shadow: 0 2rpx 4rpx rgba(0, 0, 0, 0.2);
+        color: #333333;
 
         .wd-icon {
           margin-left: 8rpx;
-          opacity: 0.8;
+          opacity: 0.7;
         }
       }
 
@@ -453,7 +517,7 @@ const navigateToSection = (section: string, subSection?: string) => {
         align-items: center;
         margin-bottom: 8rpx;
         font-size: 24rpx;
-        color: rgba(255, 255, 255, 0.8);
+        color: #666666;
 
         .wd-icon {
           margin-left: 8rpx;
@@ -474,7 +538,7 @@ const navigateToSection = (section: string, subSection?: string) => {
         text {
           font-size: 24rpx;
           font-weight: 500;
-          color: rgba(255, 255, 255, 0.9);
+          color: #666666;
         }
 
         .wd-icon {
@@ -492,11 +556,11 @@ const navigateToSection = (section: string, subSection?: string) => {
   z-index: 10;
   display: flex;
   justify-content: space-between;
-  padding: 20rpx 10rpx;
-  margin: 0;
-  background-color: rgba(30, 30, 46, 0.7);
-  backdrop-filter: blur(10px);
-  box-shadow: 0 10rpx 30rpx rgba(0, 0, 0, 0.1);
+  padding: 30rpx 20rpx;
+  margin: 20rpx;
+  background-color: #ffffff;
+  border-radius: 16rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.08);
 
   .function-button {
     position: relative;
@@ -514,20 +578,20 @@ const navigateToSection = (section: string, subSection?: string) => {
       height: 80rpx;
       margin-bottom: 12rpx;
       border-radius: 50%;
-      box-shadow: 0 8rpx 16rpx rgba(0, 0, 0, 0.2);
+      box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.15);
 
       &.blue {
-        background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
+        background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);
       }
 
       &.orange {
-        background: linear-gradient(135deg, #ea580c 0%, #f97316 100%);
+        background: linear-gradient(135deg, #f97316 0%, #fb923c 100%);
       }
     }
 
     text {
       font-size: 24rpx;
-      color: rgba(255, 255, 255, 0.9);
+      color: #666666;
     }
 
     .badge {
@@ -539,16 +603,16 @@ const navigateToSection = (section: string, subSection?: string) => {
       font-weight: bold;
       color: #fff;
       border-radius: 20rpx;
-      box-shadow: 0 4rpx 8rpx rgba(0, 0, 0, 0.3);
+      box-shadow: 0 2rpx 6rpx rgba(0, 0, 0, 0.2);
       transform: scale(0.9);
     }
 
     .rate-badge {
-      background: linear-gradient(90deg, #dc2626, #ef4444);
+      background: linear-gradient(90deg, #ef4444, #f87171);
     }
 
     .amount-badge {
-      background: linear-gradient(90deg, #ea580c, #f97316);
+      background: linear-gradient(90deg, #f97316, #fb923c);
     }
   }
 }
@@ -562,10 +626,9 @@ const navigateToSection = (section: string, subSection?: string) => {
   padding: 24rpx 30rpx;
   margin: 20rpx 20rpx 0;
   overflow: hidden;
-  color: #fff;
-  background: #1a73e8;
+  background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
   border-radius: 16rpx 16rpx 0 0;
-  box-shadow: 0 10rpx 20rpx rgba(0, 0, 0, 0.25);
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.15);
 
   .vip-left {
     display: flex;
@@ -583,7 +646,7 @@ const navigateToSection = (section: string, subSection?: string) => {
     color: #fff !important;
     background-color: #f43f5e !important;
     border-radius: 8rpx;
-    box-shadow: 0 4rpx 8rpx rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2rpx 6rpx rgba(0, 0, 0, 0.1);
 
     text {
       margin-left: 2rpx;
@@ -593,8 +656,7 @@ const navigateToSection = (section: string, subSection?: string) => {
   .vip-level {
     font-size: 30rpx;
     font-weight: bold;
-    color: #fff;
-    text-shadow: 0 2rpx 4rpx rgba(0, 0, 0, 0.1);
+    color: #ffffff;
   }
 
   .vip-right {
@@ -603,17 +665,24 @@ const navigateToSection = (section: string, subSection?: string) => {
   }
 
   .vip-balance {
-    margin-right: 12rpx;
+    margin-right: 14rpx;
     font-size: 26rpx;
     font-weight: 500;
+    color: #e3e3e3e3;
+
+    .vip-balance-text {
+      font-size: 30rpx;
+      font-weight: 800;
+      color: #ffffff;
+    }
   }
 }
 
 // 资金信息区
 .balance-info {
-  padding: 12rpx 0;
+  padding: 20rpx 0;
   margin: 0 20rpx 20rpx;
-  background-color: #1a73e8;
+  background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
   border-radius: 0 0 16rpx 16rpx;
 
   .balance-item {
@@ -644,45 +713,49 @@ const navigateToSection = (section: string, subSection?: string) => {
     }
 
     .balance-progress {
+      position: relative;
       flex: 1;
-      height: 12rpx;
+      height: 25rpx;
       margin-right: 20rpx;
       overflow: hidden;
       background-color: rgba(255, 255, 255, 0.2);
-      border-radius: 6rpx;
+      border-radius: 30rpx;
 
       .progress-bar {
         height: 100%;
         background: #34d399;
-        border-radius: 6rpx;
+        border-radius: 30rpx;
       }
-    }
 
-    .balance-value {
-      font-size: 26rpx;
-      font-weight: bold;
-      color: #fff;
-      white-space: nowrap;
+      .balance-value {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        font-size: 20rpx;
+        font-weight: bold;
+        color: #fff;
+        white-space: nowrap;
+        transform: translate(-50%, -50%);
+      }
     }
   }
 }
 
 // 菜单列表
 .menu-list {
-  padding: 0;
+  padding: 10rpx 0;
   margin: 20rpx 20rpx;
   overflow: hidden;
-  background-color: rgba(30, 30, 46, 0.7);
-  backdrop-filter: blur(10px);
+  background-color: #ffffff;
   border-radius: 16rpx;
-  box-shadow: 0 10rpx 30rpx rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.08);
 
   .menu-item {
     position: relative;
     display: flex;
     align-items: center;
     padding: 30rpx 24rpx;
-    border-bottom: 1rpx solid rgba(255, 255, 255, 0.08);
+    border-bottom: 1rpx solid rgba(0, 0, 0, 0.05);
 
     &:last-child {
       border-bottom: none;
@@ -696,53 +769,52 @@ const navigateToSection = (section: string, subSection?: string) => {
       height: 56rpx;
       margin-right: 20rpx;
       border-radius: 12rpx;
-      box-shadow: 0 6rpx 12rpx rgba(0, 0, 0, 0.2);
+      box-shadow: 0 4rpx 10rpx rgba(0, 0, 0, 0.15);
 
       &.blue {
-        background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
+        background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);
       }
 
       &.orange {
-        background: linear-gradient(135deg, #ea580c 0%, #f97316 100%);
+        background: linear-gradient(135deg, #f97316 0%, #fb923c 100%);
       }
 
       &.green {
-        background: linear-gradient(135deg, #16a34a 0%, #22c55e 100%);
+        background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
       }
 
       &.red {
-        background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+        background: linear-gradient(135deg, #ef4444 0%, #f87171 100%);
       }
 
       &.purple {
-        background: linear-gradient(135deg, #7e22ce 0%, #a855f7 100%);
+        background: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%);
       }
     }
 
     .menu-text {
       flex: 1;
       font-size: 28rpx;
-      color: rgba(255, 255, 255, 0.9);
+      color: #333333;
     }
   }
 }
 
 // 底部菜单
 .bottom-menu {
-  padding: 0;
+  padding: 10rpx 0;
   margin: 20rpx 20rpx;
   overflow: hidden;
-  background-color: rgba(30, 30, 46, 0.7);
-  backdrop-filter: blur(10px);
+  background-color: #ffffff;
   border-radius: 16rpx;
-  box-shadow: 0 10rpx 30rpx rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.08);
 
   .menu-item {
     position: relative;
     display: flex;
     align-items: center;
     padding: 30rpx 24rpx;
-    border-bottom: 1rpx solid rgba(255, 255, 255, 0.08);
+    border-bottom: 1rpx solid rgba(0, 0, 0, 0.05);
 
     &:last-child {
       border-bottom: none;
@@ -756,29 +828,29 @@ const navigateToSection = (section: string, subSection?: string) => {
       height: 56rpx;
       margin-right: 20rpx;
       border-radius: 12rpx;
-      box-shadow: 0 6rpx 12rpx rgba(0, 0, 0, 0.2);
+      box-shadow: 0 4rpx 10rpx rgba(0, 0, 0, 0.15);
 
       &.blue {
-        background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
+        background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);
       }
 
       &.orange {
-        background: linear-gradient(135deg, #ea580c 0%, #f97316 100%);
+        background: linear-gradient(135deg, #f97316 0%, #fb923c 100%);
       }
 
       &.green {
-        background: linear-gradient(135deg, #16a34a 0%, #22c55e 100%);
+        background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
       }
 
       &.purple {
-        background: linear-gradient(135deg, #7e22ce 0%, #a855f7 100%);
+        background: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%);
       }
     }
 
     .menu-text {
       flex: 1;
       font-size: 28rpx;
-      color: rgba(255, 255, 255, 0.9);
+      color: #333333;
     }
 
     .extra-text {
@@ -809,8 +881,8 @@ const navigateToSection = (section: string, subSection?: string) => {
 <style>
 /* 全局样式 */
 page {
-  color: #ffffff;
-  background-color: #171725;
+  color: #333333;
+  background-color: #f5f7fa;
 }
 
 /* wot-design-uni标签样式覆盖 */

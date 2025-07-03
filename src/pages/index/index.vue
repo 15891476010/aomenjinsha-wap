@@ -94,7 +94,6 @@ const backToIndex = () => {
 };
 
 onShow(() => {
-  console.log("我显示了");
   gameStore.getUserTransfer();
 });
 

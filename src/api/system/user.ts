@@ -135,6 +135,16 @@ const UserAPI = {
       method: "DELETE",
     });
   },
+
+  /**
+   * 检测用户是否登录
+   */
+  checkLoginApi() {
+    return request<any>({
+      url: `${USER_BASE_URL}/checkLogin`,
+      method: "POST",
+    });
+  },
 };
 export default UserAPI;
 
@@ -157,6 +167,9 @@ export interface UserInfo {
 
   /** 权限 */
   perms?: string[];
+
+  /** 余额 */
+  balance?: number;
 }
 
 /**

@@ -13,6 +13,7 @@ declare module 'vue' {
     CuPicker: typeof import('./../components/cu-picker/index.vue')['default']
     CustomLoading: typeof import('./../components/CustomLoading.vue')['default']
     DaTree: typeof import('./../components/da-tree/index.vue')['default']
+    FingerLoginPopup: typeof import('./../components/FingerLoginPopup.vue')['default']
     Loading1: typeof import('./../components/qiun-loading/loading1.vue')['default']
     Loading2: typeof import('./../components/qiun-loading/loading2.vue')['default']
     Loading3: typeof import('./../components/qiun-loading/loading3.vue')['default']
