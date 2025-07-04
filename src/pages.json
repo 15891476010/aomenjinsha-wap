@@ -151,6 +151,12 @@
       }
     },
     {
+      "path": "pages/home/index",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
       "path": "pages/index/components/gamePage",
       "style": {
         "navigationStyle": "custom"

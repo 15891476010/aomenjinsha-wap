@@ -17,11 +17,6 @@
       </view>
     </view>
 
-    <!-- 开发调试信息 -->
-    <view v-if="isDev" class="debug-info">
-      <text>状态栏高度: {{ statusBarHeight }}px</text>
-    </view>
-
     <!-- 用户信息区 -->
     <view class="user-header">
       <view class="user-info">
@@ -50,7 +45,7 @@
         v-for="(button, index) in functionButtons"
         :key="index"
         class="function-button"
-        @click="navigateToSection(button.section, button.subSection)"
+        @click="navigateToSection(button.subSection)"
       >
         <view :class="['icon-wrapper', button.colorClass]">
           <wd-icon :name="button.icon" size="24" color="#ffffff" />
@@ -150,8 +145,6 @@ const userAvatar = computed(() =>
 
 // 获取状态栏高度
 const statusBarHeight = ref(0);
-// 是否显示调试信息
-const isDev = ref(true);
 onMounted(async () => {
   const systemInfo = uni.getSystemInfoSync();
   statusBarHeight.value = systemInfo.statusBarHeight || 0;
@@ -315,50 +308,13 @@ const navigateToProfile = () => {
 };
 
 // 导航到各个板块
-const navigateToSection = (section: string, subSection?: string) => {
-  if (section === "safeLogout") {
-    navigateToSafeLogout();
-    return;
+const navigateToSection = (section: string) => {
+  console.log(section);
+  switch (section) {
+    case "fund":
+      uni.navigateTo({ url: `/pages/home/index?type=${section}` });
+      break;
   }
-  if (
-    !userInfo.value &&
-    section !== "vip" &&
-    section !== "promotion" &&
-    section !== "security" &&
-    section !== "findStore"
-  ) {
-    navigateToLoginPage();
-    return;
-  }
-
-  const sections: Record<string, string> = {
-    vip: "VIP中心",
-    balance: "我的余额",
-    accountDetail: "账户明细",
-    betRecord: "投注记录",
-    personalReport: "个人报表",
-    withdrawManage: "提现管理",
-    wallet: "钱包管理",
-    promotion: "推广赚钱",
-    security: "安全中心",
-    findStore: "找到我们",
-    profile: "个人资料",
-    safeLogout: "安全退出",
-  };
-
-  let message = sections[section] || section;
-  if (subSection) {
-    const subSections: Record<string, string> = {
-      withdraw: "提现",
-      recharge: "充值",
-      interest: "利息宝",
-      fund: "公积金",
-    };
-
-    message += ` - ${subSections[subSection] || subSection}`;
-  }
-
-  toast.show(`${message}功能正在开发中...`);
 };
 
 async function goLogin() {
