@@ -47,6 +47,24 @@ const PublicApi = {
       data: id
     })
   },
+  /**
+   * 获取我的页面跳转列表
+   */
+  getMinePagesListApi() {
+    return request<any>({
+      url: `${CONFIG_BASE_URL}/getMinePagesList`,
+      method: "GET",
+    })
+  },
+  /**
+   * 获取我的页面底部跳转列表
+   */
+  getMinePagesBottomListApi() {
+    return request<any>({
+      url: `${CONFIG_BASE_URL}/getMinePagesBottomList`,
+      method: "GET",
+    })
+  }
 };
 
 export interface GamePageQuery {
