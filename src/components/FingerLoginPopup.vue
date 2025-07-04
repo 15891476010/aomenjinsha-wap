@@ -16,7 +16,9 @@
       <view class="finger-popup-tips">请触摸指纹传感器</view>
 
       <view class="finger-popup-action">
-        <view class="cancel-btn" @click="handleCancelClick">取消</view>
+        <view class="cancel-btn" @click="handleCancelClick">
+          如果需要取消指纹登录，请按手机的返回键
+        </view>
       </view>
     </view>
   </view>
