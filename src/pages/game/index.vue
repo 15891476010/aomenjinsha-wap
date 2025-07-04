@@ -35,7 +35,7 @@
             <view
               v-for="(game, index) in gameList"
               :key="index"
-              v-bg-load="game.icon"
+              :style="{ backgroundImage: `url(${game.icon})` }"
               class="game-card"
               @click="handleGameClick(game)"
             >
@@ -80,7 +80,7 @@
             <view
               v-for="(game, index) in categoryList"
               :key="index"
-              v-bg-load="indexData.imagePrefix + game.icon"
+              :style="{ backgroundImage: `url(${indexData.imagePrefix + game.icon})` }"
               class="game-card"
               @click="handleGameClick(game)"
             >

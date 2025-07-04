@@ -58,7 +58,7 @@
       <view
         v-for="(game, index) in category.gamePlatType"
         :key="index"
-        v-bg-load="indexData.imagePrefix + game.icon"
+        :style="{ backgroundImage: `url(${indexData.imagePrefix + game.icon})` }"
         class="game-card"
         @click="navigateToMore(category.id, game)"
       >
