@@ -19,7 +19,7 @@
             @click="handleSidebarItemClick(item.platType)"
           >
             <view class="sidebar-item-icon">
-              <image
+              <ProgressiveImage
                 class="icon-image"
                 :src="indexData.imagePrefix + item.smallIcon"
                 mode="aspectFit"
@@ -35,8 +35,8 @@
             <view
               v-for="(game, index) in gameList"
               :key="index"
+              v-bg-load="game.icon"
               class="game-card"
-              :style="{ backgroundImage: `url(${game.icon})` }"
               @click="handleGameClick(game)"
             >
               <!-- <view v-if="game.tag" class="game-tag" :class="`tag-${game.tag.toLowerCase()}`">
@@ -80,8 +80,8 @@
             <view
               v-for="(game, index) in categoryList"
               :key="index"
+              v-bg-load="indexData.imagePrefix + game.icon"
               class="game-card"
-              :style="{ backgroundImage: `url(${indexData.imagePrefix + game.icon})` }"
               @click="handleGameClick(game)"
             >
               <!-- <view v-if="game.tag" class="game-tag" :class="`tag-${game.tag.toLowerCase()}`">
@@ -108,12 +108,15 @@
 </template>
 
 <script setup lang="ts">
-import Pagination from "@/components/pagination";
+import Pagination from "@/components/pagination/index.vue";
 import PublicApi from "@/api/public";
 import { getIndexData } from "@/utils/auth";
 import { useToast } from "wot-design-uni";
 import GameApi from "@/api/game";
 import { setGameData } from "@/utils/cache";
+import { ref, reactive, watch } from "vue";
+import { onLoad, onShow } from "@dcloudio/uni-app";
+import ProgressiveImage from "@/components/ProgressiveImage.vue";
 
 const toast = useToast();
 const indexData = ref(getIndexData());
@@ -127,22 +130,23 @@ const querParams = reactive({
 const total = ref(0);
 
 const isShow = ref(true);
-const gamePlatTypes = ref([]);
-const gameList = ref([]);
+const gamePlatTypes = ref<any[]>([]);
+const gameList = ref<any[]>([]);
 const loading = ref(false);
-const platTypeId = ref(null);
-const categoryList = ref([]);
+const platTypeId = ref<string | null>(null);
+const categoryList = ref<any[]>([]);
+
 // 在页面加载时设置标题
-onLoad((options) => {
-  querParams.categoryId = options?.categoryId || "0";
-  platTypeId.value = options?.platTypeId;
-  if (
-    querParams.categoryId == "3" ||
-    querParams.categoryId == "6" ||
-    querParams.categoryId == "7"
-  ) {
+onLoad((options: any) => {
+  querParams.categoryId = options?.categoryId ? Number(options.categoryId) : 0;
+  platTypeId.value = options?.platTypeId || null;
+
+  // 修复字符串与数字的比较
+  const categoryIdStr = String(querParams.categoryId);
+  if (categoryIdStr === "3" || categoryIdStr === "6" || categoryIdStr === "7") {
     isShow.value = false;
   }
+
   handleQuery();
 });
 
@@ -166,7 +170,7 @@ async function handleQuery() {
     gamePlatTypes.value = res.gamePlatTypes;
     if (isShow.value) {
       if (platTypeId.value) {
-        const plat = res.gamePlatTypes.filter((item) => {
+        const plat = res.gamePlatTypes.filter((item: any) => {
           return item.id === platTypeId.value;
         });
         querParams.platType = plat[0].platType;
@@ -216,8 +220,8 @@ async function fetchGamePlatTypeByList() {
 }
 
 // 处理侧边栏点击
-function handleSidebarItemClick(platType) {
-  const plat = gamePlatTypes.value.filter((item) => {
+function handleSidebarItemClick(platType: string) {
+  const plat = gamePlatTypes.value.filter((item: any) => {
     return item.platType === platType;
   });
   querParams.platType = platType;
@@ -225,28 +229,21 @@ function handleSidebarItemClick(platType) {
 
   // 更新URL参数，不刷新页面
   const currentRoute = getCurrentPages()[getCurrentPages().length - 1].route;
-  const newUrl = `#/${currentRoute}?categoryId=${querParams.categoryId}&platTypeId=${plat[0].id}`;
+  const newUrl = `#/${currentRoute}?categoryId=${querParams.categoryId}&platTypeId=${plat[0]?.id || ""}`;
 
   // 使用history API更新URL，不触发页面跳转
   // #ifdef H5
   history.replaceState({}, "", newUrl);
   // #endif
 
-  // 在非H5环境下，可以使用uni.redirectTo，但会刷新页面
-  // #ifndef H5
-  // uni.redirectTo({
-  //   url: newUrl
-  // });
-  // #endif
-
   fetchGameList();
 }
 
-// 监听游戏名称搜索
+// 修改为监听title
 watch(
-  () => querParams.gameName,
-  (newVal) => {
-    if (querParams.gameName !== newVal) {
+  () => querParams.title,
+  (newVal: string) => {
+    if (querParams.title !== newVal) {
       querParams.pageNum = 1;
     }
   }

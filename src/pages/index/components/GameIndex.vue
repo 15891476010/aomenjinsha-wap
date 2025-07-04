@@ -8,7 +8,11 @@
       :class="{ active: activeTab === category.id }"
       @click="scrollToCategory(category.id, index)"
     >
-      <image class="tab-icon" :src="indexData.imagePrefix + category.icon" mode="aspectFit" />
+      <ProgressiveImage
+        class="tab-icon"
+        :src="indexData.imagePrefix + category.icon"
+        mode="aspectFit"
+      />
       <text>{{ category.title }}</text>
     </view>
   </view>
@@ -23,7 +27,11 @@
   >
     <view class="section-header">
       <view class="category-title">
-        <image class="icon" :src="indexData.imagePrefix + category.icon" mode="aspectFit" />
+        <ProgressiveImage
+          class="icon"
+          :src="indexData.imagePrefix + category.icon"
+          mode="aspectFit"
+        />
         <text class="title">{{ category.title }}</text>
       </view>
     </view>
@@ -36,7 +44,7 @@
         @click="handleGameClick(game)"
       >
         <view class="game-image-container">
-          <image class="game-image" :src="game.icon" mode="aspectFit" />
+          <ProgressiveImage class="game-image" :src="game.icon" mode="aspectFit" />
           <!-- <view v-if="game.tag" class="game-tag" :class="`tag-${game.tag.toLowerCase()}`">
             {{ game.tag }}
           </view> -->
@@ -50,12 +58,12 @@
       <view
         v-for="(game, index) in category.gamePlatType"
         :key="index"
+        v-bg-load="indexData.imagePrefix + game.icon"
         class="game-card"
-        :style="{ backgroundImage: `url(${indexData.imagePrefix + game.icon})` }"
         @click="navigateToMore(category.id, game)"
       >
         <view v-if="game.isHot" class="hot-icon">
-          <image src="/static/images/hot-icon.png" mode="aspectFit" />
+          <ProgressiveImage src="/static/images/hot-icon.png" mode="aspectFit" />
         </view>
         <view v-if="game.isShowTitle" class="game-name">{{ game.platTypeName }}</view>
       </view>
@@ -71,6 +79,7 @@ import GameApi from "@/api/game";
 import { getIndexData } from "@/utils/auth";
 import { setGameData } from "@/utils/cache";
 import { onLoad } from "@dcloudio/uni-app";
+import ProgressiveImage from "@/components/ProgressiveImage.vue";
 const indexData = ref(getIndexData());
 
 const querParams: GamePageQuery = {
@@ -85,17 +94,17 @@ const querParams: GamePageQuery = {
 };
 
 // 游戏分类数据
-const gameCategories = ref<any>([]);
+const gameCategories = ref<any[]>([]);
 
 // 当前激活的标签
-const activeTab = ref("");
+const activeTab = ref<string | number>("");
 const categorySections = ref([]);
 
 // 设置滚动偏移量
 const scrollOffset = 80; // 使用120px的偏移量
 
 // 滚动到对应分类
-function scrollToCategory(categoryId, tabIndex) {
+function scrollToCategory(categoryId: string | number, tabIndex: number) {
   activeTab.value = categoryId;
 
   // 创建查询对象（兼容小程序和H5）
@@ -108,6 +117,7 @@ function scrollToCategory(categoryId, tabIndex) {
   query.select(`#category-${categoryId}`).boundingClientRect();
 
   // 查询滚动偏移量
+  // @ts-ignore: uni-app API 类型定义问题
   query.selectViewport().scrollOffset();
 
   query.exec((res) => {
@@ -127,8 +137,8 @@ function scrollToCategory(categoryId, tabIndex) {
   // 水平滚动导航栏到当前激活的标签位置（只适用于 H5）
   // 小程序建议用 scroll-view + scroll-into-view 实现
   // #ifdef H5
-  const tabElement = document.querySelector(`.game-tab:nth-child(${tabIndex + 1})`);
-  const tabsContainer = document.querySelector(".game-tabs");
+  const tabElement = document.querySelector(`.game-tab:nth-child(${tabIndex + 1})`) as HTMLElement;
+  const tabsContainer = document.querySelector(".game-tabs") as HTMLElement;
 
   if (tabElement && tabsContainer) {
     const scrollLeft =
@@ -147,8 +157,8 @@ function handleScroll() {
 
   const query = uni.createSelectorQuery();
 
-  const selectorList = gameCategories.value.map((cat) => `#category-${cat.id}`);
-  selectorList.forEach((sel) => query.select(sel).boundingClientRect());
+  const selectorList = gameCategories.value.map((cat: any) => `#category-${cat.id}`);
+  selectorList.forEach((sel: string) => query.select(sel).boundingClientRect());
 
   query.exec((rects) => {
     for (let i = 0; i < rects.length; i++) {
@@ -163,8 +173,8 @@ function handleScroll() {
 
           // 水平滚动导航栏（只对H5处理）
           // #ifdef H5
-          const tabElement = document.querySelector(`.game-tab:nth-child(${i + 1})`);
-          const tabsContainer = document.querySelector(".game-tabs");
+          const tabElement = document.querySelector(`.game-tab:nth-child(${i + 1})`) as HTMLElement;
+          const tabsContainer = document.querySelector(".game-tabs") as HTMLElement;
 
           if (tabElement && tabsContainer) {
             const scrollLeft =
@@ -476,11 +486,6 @@ onLoad(() => {
       z-index: 2;
       width: 40rpx;
       height: 40rpx;
-
-      image {
-        width: 100%;
-        height: 100%;
-      }
     }
 
     .game-name {
@@ -560,6 +565,15 @@ onLoad(() => {
   &:active {
     box-shadow: 0 3rpx 8rpx rgba(0, 0, 0, 0.05);
     transform: translateY(2rpx);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
   }
 }
 </style>

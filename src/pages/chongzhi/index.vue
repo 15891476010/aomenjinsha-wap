@@ -45,7 +45,6 @@
         "
       >
         <view v-if="item.isHot" class="hot-badge">推荐</view>
-        <view v-if="item.tag" class="tag-badge">{{ item.tag }}</view>
         <image :src="indexData.imagePrefix + item.icon" class="channel-icon" />
         <text class="channel-name">{{ item.name }}</text>
       </view>
@@ -60,7 +59,7 @@
         @click="activeSecond = idx"
       >
         <view v-if="item.isHot" class="hot-badge">推荐</view>
-        <view v-if="item.tag" class="tag-badge">{{ item.tag }}</view>
+        <view v-if="item.tag" class="tag-badge">送{{ item.tag }}%</view>
         {{ item.name }}
       </view>
     </view>
@@ -99,14 +98,17 @@
         />
       </view>
     </view>
-    <view class="common">{{ currentSeconds[activeSecond]?.common || "" }}</view>
 
     <!-- 优惠信息 -->
-    <view class="promo-section">
-      <view class="promo-title">首存优惠</view>
-      <view class="promo-detail">尚差存款 1 元</view>
-      <view class="promo-desc">存款优惠0.5%</view>
+    <view v-if="sendPrice > 0" class="promo-section">
+      <view class="promo-title">充值通道赠送 +{{ sendPrice }}</view>
+      <view v-if="currentSeconds[activeSecond].currency === 'USD'" class="promo-detail">
+        预计到帐 {{ Number(customAmount) * currentSeconds[activeSecond].rate + sendPrice }}
+      </view>
+      <view v-else class="promo-detail">预计到帐 {{ Number(customAmount) + sendPrice }}</view>
     </view>
+
+    <view class="common">{{ currentSeconds[activeSecond]?.common || "" }}</view>
 
     <!-- 确认按钮 -->
     <button class="submit-btn" :disabled="!canSubmit" @click="handleSubmit">确认提交</button>
@@ -123,7 +125,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, computed } from "vue";
+import { onMounted, ref, computed, watch } from "vue";
 import TabbarCom from "@/components/Tabbar";
 import { useUserStore } from "@/store/modules/user";
 import RechargeApi from "@/api/recharge";
@@ -138,8 +140,10 @@ const activeTab = ref(0);
 const activeChannel = ref(0);
 const activeSecond = ref(0);
 const selectedAmount = ref<number | null>(null);
-const customAmount = ref("");
+const customAmount = ref<any>(0);
 const canSubmit = ref(false);
+
+const sendPrice = ref(0);
 
 // 当前渠道（第二层）
 const currentChannels = computed(() => {
@@ -152,9 +156,20 @@ const currentSeconds = computed(() => {
   return currentChannels.value[activeChannel.value]?.second || [];
 });
 
+watch(customAmount, (newVal) => {
+  if (currentSeconds.value[activeSecond.value].currency === "USD") {
+    sendPrice.value =
+      newVal *
+      (currentSeconds.value[activeSecond.value].tag / 100) *
+      currentSeconds.value[activeSecond.value].rate;
+  } else {
+    sendPrice.value = newVal * (currentSeconds.value[activeSecond.value].tag / 100);
+  }
+});
+
 function selectAmount(amt: number) {
   selectedAmount.value = amt;
-  customAmount.value = "";
+  customAmount.value = amt;
   canSubmit.value = true;
 }
 
@@ -419,6 +434,7 @@ onMounted(() => {
 .hot-badge,
 .tag-badge {
   position: absolute;
+
   top: -6px;
   left: 0px;
   z-index: 10;
@@ -433,6 +449,7 @@ onMounted(() => {
 .tag-badge {
   top: -6px;
   left: 70px;
+  width: 40px;
   background: #ff4d4f;
 }
 </style>

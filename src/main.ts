@@ -1,6 +1,9 @@
 import { createSSRApp } from "vue";
+import { ref } from "vue";
 import App from "./App.vue";
 import setupPlugins from "@/plugins";
+import progressiveBackground from "@/directives/progressiveBackground";
+import lazyLoadMixin from "@/mixins/lazyLoadMixin";
 
 import "uno.css";
 import "@/styles/global.scss";
@@ -33,6 +36,11 @@ export function createApp() {
 
   setupStore(app);
   app.use(setupPlugins);
+  app.use(progressiveBackground);
+
+  // 添加全局mixin
+  app.mixin(lazyLoadMixin);
+
   return {
     app,
   };
