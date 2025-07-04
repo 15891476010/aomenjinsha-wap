@@ -95,10 +95,10 @@
         class="menu-item"
         @click="navigateToSection(item.section)"
       >
-        <view :class="['menu-icon', item.iconColorClass]">
-          <wd-icon :name="item.icon" size="20" color="#ffffff" />
+        <view :class="['menu-icon']">
+          <wd-img :width="30" :height="30" :src="indexData.imagePrefix + item.icon" mode="aspectFill" />
         </view>
-        <text class="menu-text">{{ item.text }}</text>
+        <text class="menu-text">{{ item.title }}</text>
         <wd-icon name="arrow-right" size="16" color="#999999" />
       </view>
     </view>
@@ -112,9 +112,9 @@
         @click="navigateToSection(item.section)"
       >
         <view :class="['menu-icon', item.iconColorClass]">
-          <wd-icon :name="item.icon" size="20" color="#ffffff" />
+          <wd-img :width="30" :height="30" :src="indexData.imagePrefix + item.icon" mode="aspectFill" />
         </view>
-        <text class="menu-text">{{ item.text }}</text>
+        <text class="menu-text">{{ item.title }}</text>
         <text v-if="item.extraText" class="extra-text">{{ item.extraText }}</text>
         <wd-icon name="arrow-right" size="16" color="#999999" />
       </view>
@@ -130,6 +130,7 @@
 import { useToast } from "wot-design-uni";
 import { useUserStore } from "@/store/modules/user";
 import { computed, ref, onMounted } from "vue";
+import PublicApi from "@/api/public";
 import TabbarCom from "@/components/Tabbar";
 
 import { getIndexData } from "@/utils/auth";
@@ -213,7 +214,6 @@ const menuItems = ref([
   {
     text: "我的余额",
     icon: "money-bag",
-    iconColorClass: "blue",
     section: "balance",
   },
   {
@@ -247,7 +247,6 @@ const bottomMenuItems = ref([
   {
     text: "推广赚钱",
     icon: "share",
-    iconColorClass: "blue",
     section: "promotion",
     extraText: "日进万元不是梦",
   },
@@ -338,6 +337,20 @@ const navigateToSafeLogout = () => {
     },
   });
 };
+
+const getMinePagesList = async () => {
+  const res = await PublicApi.getMinePagesListApi();
+  menuItems.value = res
+}
+const getMinePagesBottomList = async () => {
+  const res = await PublicApi.getMinePagesBottomListApi();
+  bottomMenuItems.value = res
+}
+onMounted(async () => {
+  await getMinePagesList();
+  await getMinePagesBottomList();
+});
+
 </script>
 
 <style lang="scss" scoped>
