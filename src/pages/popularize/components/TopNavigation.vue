@@ -1,23 +1,25 @@
 <template>
-  <view class="top-navigation">
-    <wd-tabs
-      v-model="activeTab"
-      sticky
-      slidable="always"
-      animated
-      swipeable
-      :line-width="60"
-      :line-height="4"
-      @change="handleTabChange"
-    >
-      <wd-tab 
-        v-for="tab in tabs" 
-        :key="tab.name"
-        :title="tab.title" 
-        :name="tab.name"
-      />
-    </wd-tabs>
-    
+  <view class="page-container">
+    <!-- 固定的顶部导航栏 -->
+    <view class="top-navigation">
+      <wd-tabs
+        v-model="activeTab"
+        slidable="always"
+        animated
+        swipeable
+        :line-width="60"
+        :line-height="4"
+        @change="handleTabChange"
+      >
+        <wd-tab
+          v-for="tab in tabs"
+          :key="tab.name"
+          :title="tab.title"
+          :name="tab.name"
+        />
+      </wd-tabs>
+    </view>
+
     <!-- 页面内容区域 -->
     <view class="tab-content">
       <view v-if="activeTab === 'home'">
@@ -113,9 +115,22 @@ onMounted(() => {
 </script>
 
 <style lang="scss" scoped>
+.page-container {
+  width: 100%;
+  height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
 .top-navigation {
+  position: fixed;
+  top: 85rpx; /* 状态栏 + 导航栏高度 */
+  left: 0;
+  right: 0;
   width: 100%;
   background-color: #ffffff;
+  z-index: 999;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 
   /* 强制隐藏所有滚动条 */
   * {
@@ -131,7 +146,8 @@ onMounted(() => {
 
 .tab-content {
   background-color: #f5f7fa;
-  min-height: calc(100vh - 100px);
+  min-height: 100vh;
+  padding-top: 100rpx; /* 状态栏 + 导航栏 + tabs高度 */
 }
 
 :deep(.wd-tabs) {
