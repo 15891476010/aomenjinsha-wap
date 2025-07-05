@@ -14,5 +14,9 @@ import TopNavigation from '../components/TopNavigation.vue'
   width: 100%;
   min-height: 100vh;
   background-color: #ffffff;
+  /* 优化滚动性能 */
+  -webkit-overflow-scrolling: touch;
+  /* 确保页面可以正常滚动 */
+  position: relative;
 }
 </style>

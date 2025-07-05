@@ -117,9 +117,8 @@ onMounted(() => {
 <style lang="scss" scoped>
 .page-container {
   width: 100%;
-  height: 100vh;
-  overflow-y: auto;
-  overflow-x: hidden;
+  min-height: 100vh;
+  /* 移除overflow设置，使用uni-app原生滚动 */
 }
 
 .top-navigation {
@@ -131,6 +130,10 @@ onMounted(() => {
   background-color: #ffffff;
   z-index: 999;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  /* 优化滚动性能 */
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  will-change: transform;
 
   /* 强制隐藏所有滚动条 */
   * {
@@ -147,12 +150,19 @@ onMounted(() => {
 .tab-content {
   background-color: #f5f7fa;
   min-height: 100vh;
-  padding-top: 100rpx; /* 状态栏 + 导航栏 + tabs高度 */
+  padding-top: 100rpx; /* 为固定导航栏留出足够空间 */
+  /* 确保内容区域可以正常滚动 */
+  position: relative;
 }
 
 :deep(.wd-tabs) {
   background-color: #ffffff;
   border-bottom: 1px solid #e4e7ed;
+  /* 优化滚动性能 */
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  /* 确保tabs不干扰页面滚动 */
+  touch-action: manipulation;
 }
 
 /* 全局隐藏滚动条样式 */
