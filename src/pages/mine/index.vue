@@ -96,7 +96,12 @@
         @click="navigateToSection(item.section)"
       >
         <view :class="['menu-icon']">
-          <wd-img :width="30" :height="30" :src="indexData.imagePrefix + item.icon" mode="aspectFill" />
+          <wd-img
+            :width="30"
+            :height="30"
+            :src="indexData.imagePrefix + item.icon"
+            mode="aspectFill"
+          />
         </view>
         <text class="menu-text">{{ item.title }}</text>
         <wd-icon name="arrow-right" size="16" color="#999999" />
@@ -112,7 +117,11 @@
         @click="navigateToSection(item.section)"
       >
         <view :class="['menu-icon', item.iconColorClass]">
-          <wd-img :width="30" :height="30" :src="indexData.imagePrefix + item.icon" mode="aspectFill" />
+          <ProgressiveImage
+            class="game-image"
+            :src="indexData.imagePrefix + item.icon"
+            mode="aspectFill"
+          />
         </view>
         <text class="menu-text">{{ item.title }}</text>
         <text v-if="item.extraText" class="extra-text">{{ item.extraText }}</text>
@@ -132,6 +141,7 @@ import { useUserStore } from "@/store/modules/user";
 import { computed, ref, onMounted } from "vue";
 import PublicApi from "@/api/public";
 import TabbarCom from "@/components/Tabbar";
+import ProgressiveImage from "@/components/ProgressiveImage.vue";
 
 import { getIndexData } from "@/utils/auth";
 const indexData = ref(getIndexData());
@@ -313,6 +323,9 @@ const navigateToSection = (section: string) => {
     case "fund":
       uni.navigateTo({ url: `/pages/home/index?type=${section}` });
       break;
+    case "safeLogout":
+      navigateToSafeLogout();
+      break;
   }
 };
 
@@ -340,17 +353,16 @@ const navigateToSafeLogout = () => {
 
 const getMinePagesList = async () => {
   const res = await PublicApi.getMinePagesListApi();
-  menuItems.value = res
-}
+  menuItems.value = res;
+};
 const getMinePagesBottomList = async () => {
   const res = await PublicApi.getMinePagesBottomListApi();
-  bottomMenuItems.value = res
-}
+  bottomMenuItems.value = res;
+};
 onMounted(async () => {
   await getMinePagesList();
   await getMinePagesBottomList();
 });
-
 </script>
 
 <style lang="scss" scoped>
