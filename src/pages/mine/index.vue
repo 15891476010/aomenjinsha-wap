@@ -323,6 +323,9 @@ const navigateToSection = (section: string) => {
     case "fund":
       uni.navigateTo({ url: `/pages/home/index?type=${section}` });
       break;
+    case "PromoteToMakeMoney":
+      uni.navigateTo({ url: `/pages/popularize/home/index` });
+      break;
     case "safeLogout":
       navigateToSafeLogout();
       break;

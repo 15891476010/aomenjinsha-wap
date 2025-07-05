@@ -195,9 +195,11 @@
       }
     },
     {
-      "path": "pages/popularize/index",
+      "path": "pages/popularize/home/index",
       "style": {
-        "navigationBarTitleText": "推广赚钱"
+        "navigationBarTitleText": "推广赚钱",
+        "navigationBarBackgroundColor": "#ffffff",
+        "navigationBarTextStyle": "black"
       }
     }
   ],
