@@ -242,3 +242,34 @@
 .rounded-full {
   border-radius: 9999rpx;
 }
+
+/**
+ * 隐藏滚动条样式
+ */
+/* 全局隐藏滚动条，但保持滚动功能 */
+.hide-scrollbar,
+.wd-tabs,
+.wd-tabs *,
+.top-navigation,
+.top-navigation * {
+  /* Webkit内核浏览器 (Chrome, Safari, Edge) */
+  &::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+    background: transparent !important;
+  }
+
+  /* Firefox */
+  scrollbar-width: none !important;
+
+  /* IE 10+ */
+  -ms-overflow-style: none !important;
+}
+
+/* 确保滚动功能正常 */
+.wd-tabs__nav-wrap,
+.wd-tabs__nav {
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+}

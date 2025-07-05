@@ -116,6 +116,17 @@ onMounted(() => {
 .top-navigation {
   width: 100%;
   background-color: #ffffff;
+
+  /* 强制隐藏所有滚动条 */
+  * {
+    &::-webkit-scrollbar {
+      display: none !important;
+      width: 0 !important;
+      height: 0 !important;
+    }
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+  }
 }
 
 .tab-content {
@@ -128,10 +139,41 @@ onMounted(() => {
   border-bottom: 1px solid #e4e7ed;
 }
 
+/* 全局隐藏滚动条样式 */
+:deep(.wd-tabs),
+:deep(.wd-tabs *) {
+  /* Webkit内核浏览器 */
+  &::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+  }
+
+  /* Firefox */
+  scrollbar-width: none !important;
+
+  /* IE */
+  -ms-overflow-style: none !important;
+}
+
+/* 针对可能的滚动容器 */
+:deep(.wd-tabs__header),
+:deep(.wd-tabs__nav-wrap),
+:deep(.wd-tabs__nav),
+:deep(.wd-tabs__content) {
+  &::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+  }
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
 :deep(.wd-tab) {
   font-size: 14px;
   color: #606266;
-  
+
   &.is-active {
     color: #409eff;
     font-weight: 500;

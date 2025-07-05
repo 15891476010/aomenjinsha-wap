@@ -42,4 +42,56 @@ onMounted(() => {
   </view>
 </template>
 
-<style></style>
+<style>
+/* 全局隐藏滚动条样式 */
+/* 应用到所有元素 */
+* {
+  /* Webkit内核浏览器 (Chrome, Safari, Edge) */
+  -webkit-scrollbar: none !important;
+}
+
+*::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  background: transparent !important;
+}
+
+/* Firefox */
+* {
+  scrollbar-width: none !important;
+}
+
+/* IE 10+ */
+* {
+  -ms-overflow-style: none !important;
+}
+
+/* 确保页面滚动功能正常 */
+page {
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+/* 针对 uni-app 页面容器 */
+.uni-page-body {
+  overflow-x: hidden !important;
+}
+
+/* 针对 wot-design-uni 组件 */
+.wd-tabs,
+.wd-tabs *,
+.wd-tabs__nav-wrap,
+.wd-tabs__nav {
+  -webkit-scrollbar: none !important;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+.wd-tabs__nav-wrap::-webkit-scrollbar,
+.wd-tabs__nav::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+</style>
