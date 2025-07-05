@@ -127,13 +127,14 @@
 </template>
 
 <script lang="ts" setup>
-import { useToast } from "wot-design-uni";
-import { useUserStore } from "@/store/modules/user";
-import { computed, ref, onMounted } from "vue";
+import {useToast} from "wot-design-uni";
+import {useUserStore} from "@/store/modules/user";
+import {computed, onMounted, ref} from "vue";
 import PublicApi from "@/api/public";
 import TabbarCom from "@/components/Tabbar";
 
-import { getIndexData } from "@/utils/auth";
+import {getIndexData} from "@/utils/auth";
+
 const indexData = ref(getIndexData());
 
 const toast = useToast();
@@ -210,72 +211,10 @@ const balanceItems = ref([
 ]);
 
 // 菜单列表数组
-const menuItems = ref([
-  {
-    text: "我的余额",
-    icon: "money-bag",
-    section: "balance",
-  },
-  {
-    text: "账户明细",
-    icon: "document-text",
-    iconColorClass: "orange",
-    section: "accountDetail",
-  },
-  {
-    text: "投注记录",
-    icon: "history",
-    iconColorClass: "green",
-    section: "betRecord",
-  },
-  {
-    text: "个人报表",
-    icon: "bar-chart",
-    iconColorClass: "blue",
-    section: "personalReport",
-  },
-  {
-    text: "提现管理",
-    icon: "money-withdraw",
-    iconColorClass: "red",
-    section: "withdrawManage",
-  },
-]);
+const menuItems = ref([]);
 
 // 底部菜单数组
-const bottomMenuItems = ref([
-  {
-    text: "推广赚钱",
-    icon: "share",
-    section: "promotion",
-    extraText: "日进万元不是梦",
-  },
-  {
-    text: "个人资料",
-    icon: "user",
-    iconColorClass: "orange",
-    section: "profile",
-  },
-  {
-    text: "安全中心",
-    icon: "shield-check",
-    iconColorClass: "green",
-    section: "security",
-  },
-  {
-    text: "找到我们",
-    icon: "store",
-    iconColorClass: "purple",
-    section: "findStore",
-    extraText: "防止打不开",
-  },
-  {
-    text: "安全退出",
-    icon: "back",
-    iconColorClass: "purple",
-    section: "safeLogout",
-  },
-]);
+const bottomMenuItems = ref([]);
 
 // 导航功能
 const navigateToCustomerService = () => {
@@ -313,18 +252,30 @@ const navigateToSection = (section: string) => {
     case "fund":
       uni.navigateTo({ url: `/pages/home/index?type=${section}` });
       break;
+    case "PromoteToMakeMoney":
+      uni.navigateTo({ url: `/pages/popularize/index`});
+      break;
+    case "safeLogout":
+      navigateToSafeLogout();
+      break;
   }
 };
-
 async function goLogin() {
   uni.navigateTo({
     url: "/pages/login/index",
   });
 }
-
 // 安全退出
 const navigateToSafeLogout = () => {
-  // 确认弹窗
+  // 检查用户是否已登录
+  if (!userInfo.value) {
+    // 未登录，引导用户去登录页面
+    toast.show("请先登录");
+    navigateToLoginPage();
+    return;
+  }
+
+  // 已登录，显示确认弹窗
   uni.showModal({
     title: "安全退出",
     content: "确定要安全退出吗？",
@@ -339,12 +290,10 @@ const navigateToSafeLogout = () => {
 };
 
 const getMinePagesList = async () => {
-  const res = await PublicApi.getMinePagesListApi();
-  menuItems.value = res
+  menuItems.value = await PublicApi.getMinePagesListApi()
 }
 const getMinePagesBottomList = async () => {
-  const res = await PublicApi.getMinePagesBottomListApi();
-  bottomMenuItems.value = res
+  bottomMenuItems.value = await PublicApi.getMinePagesBottomListApi()
 }
 onMounted(async () => {
   await getMinePagesList();
