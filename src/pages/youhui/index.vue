@@ -32,7 +32,11 @@
               class="activity-list"
               @click="goDetail(item1.id)"
             >
-              <image :src="indexData.imagePrefix + item1.image" mode="widthFix" />
+              <ProgressiveImage
+                class="game-image"
+                :src="indexData.imagePrefix + item1.image"
+                mode="widthFix"
+              />
               <view class="info">
                 <view class="title">{{ item1.title }}</view>
                 <!-- <view class="desc">{{ item1.createTime }}</view> -->
@@ -54,6 +58,7 @@ import TabbarCom from "@/components/Tabbar";
 import FrontApi from "@/api/front/index";
 import { ref, onMounted } from "vue";
 import { useUserStore } from "@/store/modules/user";
+import ProgressiveImage from "@/components/ProgressiveImage.vue";
 const userStore = useUserStore();
 const userInfo = ref<any>(userStore.userInfo || {});
 import { getIndexData } from "@/utils/auth";
