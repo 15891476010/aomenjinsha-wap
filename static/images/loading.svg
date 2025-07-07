@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <style>
+    .spinner {
+      transform-origin: center;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+  <circle class="spinner" cx="12" cy="12" r="10" stroke="#ffffff" stroke-width="2" fill="none" />
+  <path class="spinner" d="M12 2a10 10 0 0 1 10 10" stroke="#ffffff" stroke-width="2" />
+</svg> 

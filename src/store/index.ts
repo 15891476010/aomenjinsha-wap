@@ -12,4 +12,5 @@ export * from "./modules/user";
 export * from "./modules/dict";
 export * from "./modules/theme";
 export * from "./modules/game";
+export * from "./modules/recharge";
 export { store };
