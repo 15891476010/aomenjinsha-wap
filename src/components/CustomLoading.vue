@@ -1,134 +1,83 @@
 <template>
-  <view v-if="show" class="custom-loading-mask" :class="{ mask: mask }">
-    <view class="custom-loading">
-      <image v-if="customIcon" class="custom-icon" :src="customIcon" mode="aspectFit"></image>
-      <view v-else class="default-icon"></view>
-      <text class="loading-text">{{ title || "加载中..." }}</text>
+  <view v-if="isShow" class="custom-loading">
+    <view v-if="isMask" class="custom-loading-mask"></view>
+    <view class="custom-loading-container">
+      <image class="custom-loading-icon" :src="iconSrc" mode="aspectFit" />
+      <text class="custom-loading-text">{{ titleText }}</text>
     </view>
   </view>
 </template>
 
 <script setup lang="ts">
-import { watch, onMounted, ref } from "vue";
+import { loadingState } from "@/utils/request";
+import { watch, computed } from "vue";
 
-// 定义props
-const props = defineProps({
-  show: {
-    type: Boolean,
-    default: false,
-  },
-  title: {
-    type: String,
-    default: "加载中...",
-  },
-  customIcon: {
-    type: String,
-    default: "",
-  },
-  mask: {
-    type: Boolean,
-    default: true,
-  },
-});
+// 使用计算属性来获取最新的状态
+const isShow = computed(() => loadingState.value.show);
+const titleText = computed(() => loadingState.value.title);
+const iconSrc = computed(() => loadingState.value.customIcon);
+const isMask = computed(() => loadingState.value.mask);
 
-// 内部状态，用于强制更新
-const forceUpdate = ref(0);
-
-// 监听显示状态变化，便于调试
+// 添加状态监听以便调试
 watch(
-  () => props.show,
+  isShow,
   (newVal) => {
-    console.log("Loading component visibility changed:", newVal);
-    console.log("Loading component customIcon:", props.customIcon);
-
-    // 强制触发视图更新
-    if (newVal) {
-      forceUpdate.value++;
-      setTimeout(() => {
-        console.log("Loading component should be visible now");
-        console.log("Current customIcon:", props.customIcon);
-        forceUpdate.value++; // 再次更新以确保渲染
-      }, 100);
-    }
-  }
+    console.log("CustomLoading组件: show变化为", newVal);
+    console.log("CustomLoading组件: 当前完整状态", {
+      show: isShow.value,
+      title: titleText.value,
+      icon: iconSrc.value,
+      mask: isMask.value,
+    });
+  },
+  { immediate: true }
 );
-
-// 监听图标变化
-watch(
-  () => props.customIcon,
-  (newVal) => {
-    console.log("Loading component customIcon changed:", newVal);
-    forceUpdate.value++; // 强制更新
-  }
-);
-
-onMounted(() => {
-  console.log("CustomLoading component mounted");
-  console.log("Initial props:", {
-    show: props.show,
-    title: props.title,
-    customIcon: props.customIcon,
-    mask: props.mask,
-  });
-});
 </script>
 
-<style>
-/* 全局样式，确保在所有平台上都能正确显示 */
-.custom-loading-mask {
+<style scoped>
+.custom-loading {
   position: fixed;
   top: 0;
   right: 0;
   bottom: 0;
   left: 0;
-  z-index: 9999;
+  z-index: 99999; /* 确保在最上层 */
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.mask {
-  background-color: rgba(0, 0, 0, 0.4);
+.custom-loading-mask {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.5);
 }
 
-.custom-loading {
+.custom-loading-container {
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   align-items: center;
-  min-width: 200rpx;
-  min-height: 200rpx;
+  justify-content: center;
+  width: 240rpx;
+  height: 240rpx;
   padding: 30rpx;
   background-color: rgba(0, 0, 0, 0.7);
-  border-radius: 10rpx;
+  border-radius: 16rpx;
 }
 
-.custom-icon {
+.custom-loading-icon {
   width: 80rpx;
   height: 80rpx;
-  animation: spin 1s linear infinite; /* 添加旋转动画 */
+  margin-bottom: 20rpx;
 }
 
-.default-icon {
-  width: 60rpx;
-  height: 60rpx;
-  border: 5rpx solid #ffffff;
-  border-top-color: transparent;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-.loading-text {
-  margin-top: 20rpx;
+.custom-loading-text {
   font-size: 28rpx;
   color: #ffffff;
-}
-
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
+  text-align: center;
 }
 </style>

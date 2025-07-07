@@ -9,23 +9,39 @@ import { ref } from "vue";
 export const loadingState = ref({
   show: false,
   title: "加载中...",
-  customIcon: "",
+  customIcon: "/static/images/loading.svg",
   mask: true,
 });
 
 // 显示自定义加载
-function showCustomLoading(title?: string, customIcon?: string) {
+export function showCustomLoading(title?: string, customIcon?: string) {
+  console.log("showCustomLoading", title, customIcon);
+
+  // 先强制设置为false，然后在nextTick中设置为true，以确保状态变化能被检测到
   loadingState.value = {
-    show: true,
+    show: false,
     title: title || "加载中...",
     customIcon: customIcon || "/static/images/loading.svg",
     mask: true,
   };
+
+  // 使用setTimeout确保上述状态变化已经被应用
+  setTimeout(() => {
+    loadingState.value = {
+      show: true,
+      title: title || "加载中...",
+      customIcon: customIcon || "/static/images/loading.svg",
+      mask: true,
+    };
+    console.log("showCustomLoading设置后状态:", JSON.stringify(loadingState.value));
+  }, 10);
 }
 
 // 隐藏自定义加载
-function hideCustomLoading() {
+export function hideCustomLoading() {
+  console.log("hideCustomLoading被调用");
   loadingState.value.show = false;
+  console.log("hideCustomLoading后状态:", loadingState.value.show);
 }
 
 // 基础URL
@@ -108,12 +124,19 @@ export default function request<T>(
   // #endif
 
   // 显示加载图标，默认显示
-  const showLoading = options.loading !== false;
+  // const showLoading = options.loading !== false;
+  const showLoading = true;
+  options.loadingIcon = "/static/images/loading.svg";
+  // 记录是否使用了自定义加载
+  let isUsingCustomLoading = false;
+
   if (showLoading) {
     // 使用自定义加载组件或默认的uni.showLoading
     if (options.loadingIcon) {
+      console.log("使用自定义加载组件");
       // 使用自定义加载组件
       showCustomLoading(options.loadingTitle, options.loadingIcon);
+      isUsingCustomLoading = true;
     } else {
       // 使用默认加载
       uni.showLoading({
@@ -167,6 +190,10 @@ export default function request<T>(
           uni.navigateTo({
             url: "/pages/login/index",
           });
+          reject({
+            message: "令牌失效或过期",
+            code: (resData as any).code,
+          });
         } else {
           // 其他业务处理失败
           uni.showToast({
@@ -181,14 +208,6 @@ export default function request<T>(
       },
       fail: (error) => {
         console.log("fail error", error);
-        // 隐藏加载图标
-        if (showLoading) {
-          if (options.loadingIcon) {
-            hideCustomLoading();
-          } else {
-            uni.hideLoading();
-          }
-        }
         uni.showToast({
           title: "网络请求失败",
           icon: "none",
@@ -202,7 +221,7 @@ export default function request<T>(
       complete: () => {
         // 请求完成时隐藏加载图标
         if (showLoading) {
-          if (options.loadingIcon) {
+          if (isUsingCustomLoading) {
             hideCustomLoading();
           } else {
             uni.hideLoading();

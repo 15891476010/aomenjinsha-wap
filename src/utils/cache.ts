@@ -1,6 +1,7 @@
 const TOKEN_KEY = "app-token";
 const USER_INFO_KEY = "user-info";
 const GAME_DATA_KEY = "game_data";
+const RECHARGE_LIST_KEY = "recharge_list";
 import { decrypt, encrypt } from "@/utils/AESUtil";
 
 // 设置 token
@@ -48,6 +49,15 @@ export function clearGameData() {
   uni.removeStorageSync(GAME_DATA_KEY);
 }
 
+// 缓存充值列表
+export function setRechargeList(list: any) {
+  uni.setStorageSync(RECHARGE_LIST_KEY, encrypt(list));
+}
+
+// 获取充值列表
+export function getRechargeList(): any {
+  return decrypt(uni.getStorageSync(RECHARGE_LIST_KEY)) || null;
+}
 // 清除所有缓存信息
 export function clearAll() {
   clearToken();

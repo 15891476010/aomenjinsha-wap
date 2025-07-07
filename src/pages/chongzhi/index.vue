@@ -68,8 +68,8 @@
     <view
       v-if="
         currentSeconds[activeSecond] &&
-        currentSeconds[activeSecond].three &&
-        currentSeconds[activeSecond].three.length > 0
+        currentSeconds[activeSecond].amountList &&
+        currentSeconds[activeSecond].amountList.split(',').length > 0
       "
       class="amount-section"
     >
@@ -79,14 +79,14 @@
       </view>
       <view class="amount-btns">
         <view
-          v-for="item in currentSeconds[activeSecond].three"
-          :key="item.id"
-          :class="['amount-btn', { selected: selectedAmount === item.amount }]"
-          @click="selectAmount(item.amount)"
+          v-for="item in currentSeconds[activeSecond].amountList.split(',')"
+          :key="item"
+          :class="['amount-btn', { selected: selectedAmount === item }]"
+          @click="selectAmount(item)"
         >
           <view v-if="item.isHot" class="hot-badge">推荐</view>
           <view v-if="item.tag" class="tag-badge">{{ item.tag }}</view>
-          {{ item.amount }}
+          {{ item }}
         </view>
         <input
           v-if="currentSeconds[activeSecond]?.isOnlySetting"
@@ -130,12 +130,15 @@ import TabbarCom from "@/components/Tabbar";
 import { useUserStore } from "@/store/modules/user";
 import RechargeApi from "@/api/recharge";
 import { getIndexData } from "@/utils/auth";
+import { useRechargeStore } from "@/store";
 const indexData = ref(getIndexData());
 
 const userStore = useUserStore();
 const userInfo = computed(() => userStore.userInfo);
 
-const payTabs = ref<any[]>([]);
+const rechargeStore = useRechargeStore();
+const payTabs = computed(() => rechargeStore.rechargeList);
+
 const activeTab = ref(0);
 const activeChannel = ref(0);
 const activeSecond = ref(0);
@@ -173,23 +176,21 @@ function selectAmount(amt: number) {
   canSubmit.value = true;
 }
 
-async function getRecharge() {
-  const res = await RechargeApi.getRecharge();
-  payTabs.value = res;
+function getRecharge() {
+  rechargeStore.getRechargeListStore();
 }
 
-function handleSubmit() {
+async function handleSubmit() {
   // 获取当前 three 层级的对象
   const currentSecond = currentSeconds.value[activeSecond.value];
-  let selectedThree = null;
-  if (currentSecond && currentSecond.three && currentSecond.three.length > 0) {
-    selectedThree = currentSecond.three.find((item: any) => item.amount === selectedAmount.value);
-  }
   // 如果是自定义金额
   const amount = selectedAmount.value || customAmount.value;
-  console.log("当前金额对象：", selectedThree);
-  console.log("提交金额：", amount);
-  window.open(selectedThree.targer + "?amount=" + amount, selectedThree.openType);
+  // window.open(selectedThree.targer + "?amount=" + amount, selectedThree.openType);
+  const res = await RechargeApi.addRechargeApi({
+    amount: Number(amount),
+    secondId: currentSecond.id,
+  });
+  console.log("提交结果：", res);
 }
 
 onMounted(() => {

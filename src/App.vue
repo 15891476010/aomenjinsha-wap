@@ -1,15 +1,28 @@
 <script setup lang="ts">
 import { onLaunch, onShow, onHide } from "@dcloudio/uni-app";
+import { ref, onMounted } from "vue";
 import { getIndexData } from "@/utils/auth";
+import CustomLoading from "@/components/CustomLoading.vue";
+import { loadingState, showCustomLoading, hideCustomLoading } from "@/utils/request";
+
 const indexData = ref(getIndexData());
 
+// 测试自定义加载
+function testCustomLoading() {
+  showCustomLoading("测试中...");
+  setTimeout(() => {
+    hideCustomLoading();
+  }, 3000);
+}
+
 onLaunch(() => {
+  console.log("App Launch");
   // #ifdef H5
   document.title = indexData.value.websiteName;
   // 动态设置favicon
-  let link = document.querySelector('link[rel="icon"]');
+  let link = document.querySelector('link[rel="icon"]') as HTMLLinkElement;
   if (!link) {
-    link = document.createElement("link");
+    link = document.createElement("link") as HTMLLinkElement;
     link.rel = "icon";
     document.head.appendChild(link);
   }
@@ -27,18 +40,17 @@ onHide(() => {
 
 onMounted(() => {
   console.log("App Mounted");
+  console.log("加载状态组件初始状态:", JSON.stringify(loadingState.value));
+
+  // 延迟1秒后测试加载状态
+  setTimeout(testCustomLoading, 1000);
 });
 </script>
 
 <template>
   <view>
     <!-- 自定义加载组件 -->
-    <CustomLoading
-      :show="loadingState.show"
-      :title="loadingState.title"
-      :customIcon="loadingState.customIcon"
-      :mask="loadingState.mask"
-    />
+    <CustomLoading />
   </view>
 </template>
 
@@ -48,6 +60,10 @@ onMounted(() => {
 * {
   /* Webkit内核浏览器 (Chrome, Safari, Edge) */
   -webkit-scrollbar: none !important;
+  /* Firefox */
+  scrollbar-width: none !important;
+  /* IE 10+ */
+  -ms-overflow-style: none !important;
 }
 
 *::-webkit-scrollbar {
@@ -55,16 +71,6 @@ onMounted(() => {
   width: 0 !important;
   height: 0 !important;
   background: transparent !important;
-}
-
-/* Firefox */
-* {
-  scrollbar-width: none !important;
-}
-
-/* IE 10+ */
-* {
-  -ms-overflow-style: none !important;
 }
 
 /* 确保页面滚动功能正常 */
