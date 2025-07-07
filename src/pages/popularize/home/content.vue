@@ -249,7 +249,7 @@
       <view class="agent-level-modal">
         <view class="modal-header">
           <text class="modal-title">代理等级</text>
-          <wd-icon name="close" size="20rpx" color="var(--text-secondary, #86909c)" @click="closeAgentLevelModal" />
+          <wd-icon name="close" size="20rpx" color="#999999" @click="closeAgentLevelModal" />
         </view>
 
         <view class="modal-subtitle">
@@ -918,49 +918,50 @@ onMounted(() => {
 /* 代理等级弹窗样式 */
 .agent-level-modal {
   width: 640rpx;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 40rpx;
+  background: #ffffff;
+  border-radius: 16rpx;
   overflow: hidden;
-  color: #ffffff;
-  box-shadow: 0 20rpx 60rpx rgba(0, 0, 0, 0.3);
+  color: #333333;
+  box-shadow: 0 8rpx 32rpx rgba(0, 0, 0, 0.1);
   position: relative;
+  border: 1rpx solid #f0f0f0;
 }
 
 .modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 40rpx 32rpx 20rpx;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10rpx);
+  padding: 32rpx 24rpx 16rpx;
+  background: #ffffff;
   position: relative;
+  border-top-left-radius: 16rpx;
+  border-top-right-radius: 16rpx;
 
   &::after {
     content: '';
     position: absolute;
     bottom: 0;
-    left: 32rpx;
-    right: 32rpx;
+    left: 24rpx;
+    right: 24rpx;
     height: 1rpx;
-    background: rgba(255, 255, 255, 0.2);
+    background: #f0f0f0;
   }
 }
 
 .modal-title {
-  font-size: 36rpx;
+  font-size: 32rpx;
   font-weight: 600;
-  color: #ffffff;
-  text-shadow: 0 2rpx 4rpx rgba(0, 0, 0, 0.2);
+  color: #333333;
 }
 
 .modal-subtitle {
-  padding: 24rpx 32rpx;
+  padding: 16rpx 24rpx;
   text-align: center;
-  background: rgba(255, 255, 255, 0.05);
+  background: #f8f9fa;
 
   text {
-    font-size: 26rpx;
-    color: rgba(255, 255, 255, 0.8);
+    font-size: 24rpx;
+    color: #666666;
     line-height: 1.4;
   }
 }
@@ -968,9 +969,9 @@ onMounted(() => {
 .level-list {
   max-height: 480rpx;
   overflow-y: auto;
-  background: rgba(255, 255, 255, 0.05);
-  margin: 0 20rpx;
-  border-radius: 24rpx;
+  background: #ffffff;
+  margin: 0 16rpx;
+  border-radius: 12rpx;
 
   /* 自定义滚动条 */
   &::-webkit-scrollbar {
@@ -978,64 +979,53 @@ onMounted(() => {
   }
 
   &::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.1);
+    background: #f5f5f5;
     border-radius: 3rpx;
   }
 
   &::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.3);
+    background: #d9d9d9;
     border-radius: 3rpx;
 
     &:hover {
-      background: rgba(255, 255, 255, 0.5);
+      background: #bfbfbf;
     }
   }
 }
 
 .level-item {
-  padding: 24rpx 28rpx;
-  margin: 12rpx 16rpx;
-  border-radius: 20rpx;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 20rpx 24rpx;
+  margin: 8rpx 12rpx;
+  border-radius: 12rpx;
+  transition: all 0.3s ease;
   position: relative;
-  background: rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(10rpx);
+  background: #f8f9fa;
+  border: 1rpx solid #e9ecef;
 
   &.current-level {
-    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-    transform: scale(1.02);
-    box-shadow: 0 8rpx 25rpx rgba(79, 172, 254, 0.4);
+    background: #e6f7ff;
+    border-color: var(--primary-color, #165dff);
+    box-shadow: 0 4rpx 12rpx rgba(22, 93, 255, 0.15);
 
     .level-text {
-      color: #ffffff;
+      color: var(--primary-color, #165dff);
       font-weight: 600;
     }
 
     .level-amount {
-      color: #ffffff;
-      text-shadow: 0 1rpx 2rpx rgba(0, 0, 0, 0.2);
+      color: var(--primary-color, #165dff);
+      font-weight: 600;
     }
 
     .level-badge {
-      border-color: rgba(255, 255, 255, 0.8);
-      box-shadow: 0 0 0 4rpx rgba(255, 255, 255, 0.2);
-    }
-
-    &::before {
-      content: '✓';
-      position: absolute;
-      right: 20rpx;
-      top: 50%;
-      transform: translateY(-50%);
-      font-size: 24rpx;
-      color: #ffffff;
-      font-weight: bold;
+      border-color: var(--primary-color, #165dff);
     }
   }
 
   &:hover {
-    background: rgba(255, 255, 255, 0.12);
-    transform: translateY(-2rpx);
+    background: #e9ecef;
+    transform: translateY(-1rpx);
+    box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.1);
   }
 
   &:active {
@@ -1075,43 +1065,43 @@ onMounted(() => {
 }
 
 .level-text {
-  font-size: 30rpx;
-  color: rgba(255, 255, 255, 0.9);
+  font-size: 28rpx;
+  color: #333333;
   font-weight: 500;
-  letter-spacing: 1rpx;
 }
 
 .level-amount {
-  font-size: 30rpx;
-  color: #ffd700;
+  font-size: 28rpx;
+  color: #ff6b35;
   font-weight: 600;
-  text-shadow: 0 1rpx 3rpx rgba(0, 0, 0, 0.3);
 }
 
 .modal-footer {
-  padding: 32rpx;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10rpx);
+  padding: 24rpx;
+  background: #ffffff;
   position: relative;
+  border-bottom-left-radius: 16rpx;
+  border-bottom-right-radius: 16rpx;
 
   &::before {
     content: '';
     position: absolute;
     top: 0;
-    left: 32rpx;
-    right: 32rpx;
+    left: 24rpx;
+    right: 24rpx;
     height: 1rpx;
-    background: rgba(255, 255, 255, 0.2);
+    background: #f0f0f0;
   }
 }
 
 .current-progress {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 32rpx;
-  padding: 20rpx 24rpx;
-  background: rgba(255, 255, 255, 0.15);
-  border-radius: 24rpx;
+  margin-bottom: 24rpx;
+  padding: 16rpx 20rpx;
+  background: #f8f9fa;
+  border-radius: 12rpx;
+  border: 1rpx solid #e9ecef;
   backdrop-filter: blur(10rpx);
   border: 1rpx solid rgba(255, 255, 255, 0.2);
   position: relative;
@@ -1130,70 +1120,60 @@ onMounted(() => {
 }
 
 .progress-text {
-  font-size: 26rpx;
-  color: rgba(255, 255, 255, 0.8);
+  font-size: 24rpx;
+  color: #666666;
   font-weight: 500;
-  position: relative;
-  z-index: 1;
 
   &:last-child {
-    color: #ffd700;
+    color: var(--primary-color, #165dff);
     font-weight: 600;
-    text-shadow: 0 1rpx 2rpx rgba(0, 0, 0, 0.2);
   }
 }
 
 .confirm-btn {
   width: 100%;
-  height: 88rpx !important;
-  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%) !important;
+  height: 80rpx !important;
+  background: var(--primary-color, #165dff) !important;
   border: none !important;
-  border-radius: 24rpx !important;
-  font-size: 32rpx !important;
-  font-weight: 600 !important;
+  border-radius: 12rpx !important;
+  font-size: 28rpx !important;
+  font-weight: 500 !important;
   color: #ffffff !important;
-  box-shadow: 0 8rpx 25rpx rgba(79, 172, 254, 0.4);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  position: relative;
-  overflow: hidden;
-
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-    transition: left 0.5s;
-  }
+  box-shadow: 0 4rpx 12rpx rgba(22, 93, 255, 0.3);
+  transition: all 0.3s ease;
 
   &:active {
-    transform: scale(0.98);
-    box-shadow: 0 4rpx 15rpx rgba(79, 172, 254, 0.6);
-
-    &::before {
-      left: 100%;
-    }
+    transform: translateY(1rpx);
+    box-shadow: 0 2rpx 8rpx rgba(22, 93, 255, 0.4);
   }
 }
 
 /* 弹窗遮罩层样式调整 */
 :deep(.wd-popup) {
-  border-radius: 50rpx !important;
   .wd-popup__modal {
-    background: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(4rpx);
+    background: rgba(0, 0, 0, 0.5);
+  }
+
+  .wd-popup__container {
+    border-radius: 16rpx !important;
+    overflow: hidden !important;
+    background: transparent !important;
+  }
+
+  .wd-popup__content {
+    border-radius: 16rpx !important;
+    overflow: hidden !important;
+    background: transparent !important;
   }
 }
 
 /* 关闭按钮样式优化 */
 :deep(.wd-icon) {
-  color: rgba(255, 255, 255, 0.8) !important;
+  color: #999999 !important;
   transition: all 0.3s ease;
 
   &:active {
-    color: #ffffff !important;
+    color: #666666 !important;
     transform: scale(1.1);
   }
 }
