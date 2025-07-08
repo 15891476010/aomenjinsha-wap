@@ -123,7 +123,7 @@ onMounted(() => {
 
 .top-navigation {
   position: fixed;
-  top: 85rpx; /* 状态栏 + 导航栏高度 */
+  //top: 88rpx; /* 状态栏 + 导航栏高度 */
   left: 0;
   right: 0;
   width: 100%;

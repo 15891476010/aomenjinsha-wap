@@ -1,136 +1,74 @@
 <template>
   <view class="commission-page">
-    <view class="content">
-      <!-- 佣金概览 -->
-      <wd-card title="佣金概览" class="commission-overview-card">
-        <wd-row :gutter="20">
-          <wd-col :span="12" v-for="item in commissionItems" :key="item.label">
-            <view class="commission-item">
-              <wd-icon :name="item.icon" size="32rpx" color="#ff7d00" />
-              <text class="commission-value">¥{{ item.value }}</text>
-              <text class="commission-label">{{ item.label }}</text>
-            </view>
-          </wd-col>
-        </wd-row>
-      </wd-card>
-
-      <!-- 佣金操作 -->
-      <wd-card title="佣金操作" class="commission-action-card">
-        <view class="action-buttons">
-          <wd-button type="primary" block @click="withdrawCommission">
-            <wd-icon name="money" />
-            提取佣金
-          </wd-button>
-          <wd-button type="success" block @click="viewCommissionHistory" style="margin-top: 20rpx;">
-            <wd-icon name="list" />
-            佣金记录
-          </wd-button>
-        </view>
-      </wd-card>
-
-      <!-- 佣金规则 -->
-      <wd-card title="佣金规则" class="commission-rules-card">
-        <wd-steps :current="currentCommissionLevel" direction="vertical">
-          <wd-step 
-            v-for="(rule, index) in commissionRules" 
-            :key="index"
-            :title="rule.title"
-            :description="rule.description"
-            :status="index <= currentCommissionLevel ? 'finish' : 'wait'"
-          />
-        </wd-steps>
-      </wd-card>
-
-      <!-- 佣金统计 -->
-      <wd-card title="佣金统计" class="commission-stats-card">
-        <wd-tabs v-model="statsTab">
-          <wd-tab title="本月" name="month">
-            <wd-cell-group border>
-              <wd-cell title="投注佣金" value="¥12,680.00" />
-              <wd-cell title="推广佣金" value="¥3,850.00" />
-              <wd-cell title="团队佣金" value="¥2,150.00" />
-              <wd-cell title="奖励佣金" value="¥680.00" />
-            </wd-cell-group>
-          </wd-tab>
-          <wd-tab title="上月" name="lastMonth">
-            <wd-cell-group border>
-              <wd-cell title="投注佣金" value="¥15,280.00" />
-              <wd-cell title="推广佣金" value="¥4,650.00" />
-              <wd-cell title="团队佣金" value="¥3,280.00" />
-              <wd-cell title="奖励佣金" value="¥1,200.00" />
-            </wd-cell-group>
-          </wd-tab>
-          <wd-tab title="累计" name="total">
-            <wd-cell-group border>
-              <wd-cell title="投注佣金" value="¥186,500.00" />
-              <wd-cell title="推广佣金" value="¥56,800.00" />
-              <wd-cell title="团队佣金" value="¥38,600.00" />
-              <wd-cell title="奖励佣金" value="¥15,200.00" />
-            </wd-cell-group>
-          </wd-tab>
-        </wd-tabs>
-      </wd-card>
-
-      <!-- 最近记录 -->
-      <wd-card title="最近记录" class="commission-records-card">
-        <wd-cell-group border>
-          <wd-cell 
-            v-for="record in recentCommissionRecords" 
-            :key="record.id"
-            :title="record.type"
-            :value="`¥${record.amount}`"
-            :label="record.time"
-          >
-            <template #icon>
-              <wd-icon :name="record.icon" :color="record.color" />
-            </template>
-          </wd-cell>
-        </wd-cell-group>
-        <view class="view-more">
-          <wd-button type="text" @click="viewAllRecords">查看全部记录</wd-button>
-        </view>
-      </wd-card>
-
-      <!-- 提现设置 -->
-      <wd-card title="提现设置" class="withdraw-settings-card">
-        <wd-cell-group border>
-          <wd-cell title="银行卡" value="****1234" is-link @click="manageBankCard">
-            <template #icon>
-              <wd-icon name="bank-card" color="#165dff" />
-            </template>
-          </wd-cell>
-          <wd-cell title="支付宝" value="未绑定" is-link @click="bindAlipay">
-            <template #icon>
-              <wd-icon name="alipay" color="#00b42a" />
-            </template>
-          </wd-cell>
-          <wd-cell title="微信" value="已绑定" is-link @click="manageWechat">
-            <template #icon>
-              <wd-icon name="wechat" color="#07c160" />
-            </template>
-          </wd-cell>
-        </wd-cell-group>
-      </wd-card>
+    <!-- 结算周期信息 -->
+    <view class="settlement-info-section">
+      <view class="info-item">
+        <text class="info-label">结算周期</text>
+        <text class="info-value">{{ settlementCycle }}</text>
+      </view>
     </view>
 
-    <!-- 提取佣金弹窗 -->
-    <wd-popup v-model="showWithdrawPopup" position="bottom">
-      <view class="withdraw-popup">
-        <view class="popup-header">
-          <text class="popup-title">提取佣金</text>
-          <wd-icon name="close" @click="showWithdrawPopup = false" />
+    <!-- 时间筛选区域 -->
+    <view class="time-filter-section">
+      <view class="filter-dropdown" @click="showTimeSelector">
+        <text class="filter-text">{{ currentTimeLabel }}</text>
+        <wd-icon name="arrow-down" size="24rpx" color="#86909c" />
+      </view>
+    </view>
+
+    <!-- 佣金记录区域 -->
+    <view class="commission-records-section">
+      <!-- 空状态 -->
+      <view v-if="commissionRecords.length === 0" class="empty-state">
+        <view class="empty-icon">
+          <text class="empty-dot">.</text>
         </view>
-        <view class="popup-content">
-          <wd-input 
-            v-model="withdrawAmount" 
-            type="number" 
-            placeholder="请输入提取金额"
-            prefix-icon="money"
-          />
-          <text class="available-amount">可提取金额：¥{{ commissionItems[3].value }}</text>
-          <wd-button type="primary" block @click="confirmWithdraw" style="margin-top: 40rpx;">
-            确认提取
-          </wd-button>
+        <text class="empty-text">暂无记录</text>
+      </view>
+
+      <!-- 佣金记录列表 -->
+      <view v-else class="records-list">
+        <view
+          class="record-item"
+          v-for="record in commissionRecords"
+          :key="record.id"
+        >
+          <view class="record-header">
+            <text class="record-date">{{ record.date }}</text>
+            <text class="record-amount">¥{{ record.amount }}</text>
+          </view>
+          <view class="record-details">
+            <text class="record-type">{{ record.type }}</text>
+            <text class="record-status" :class="record.statusClass">{{ record.status }}</text>
+          </view>
+          <view v-if="record.description" class="record-description">
+            <text class="description-text">{{ record.description }}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 时间选择器弹窗 -->
+    <wd-popup
+      v-model="showTimePicker"
+      position="bottom"
+      :safe-area-inset-bottom="true"
+    >
+      <view class="time-picker-popup">
+        <view class="picker-header">
+          <text class="picker-title">选择时间</text>
+          <wd-icon name="close" size="32rpx" color="#86909c" @click="closeTimeSelector" />
+        </view>
+        <view class="picker-options">
+          <view
+            class="picker-option"
+            :class="{ active: selectedTime === option.value }"
+            v-for="option in timeOptions"
+            :key="option.value"
+            @click="selectTime(option.value)"
+          >
+            {{ option.label }}
+          </view>
         </view>
       </view>
     </wd-popup>
@@ -138,124 +76,91 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useToast } from 'wot-design-uni'
 
 // Toast 实例
 const toast = useToast()
 
-// 佣金等级
-const currentCommissionLevel = ref(2)
+// 结算周期
+const settlementCycle = ref('-')
 
-// 统计标签页
-const statsTab = ref('month')
+// 当前选中的时间
+const selectedTime = ref('today')
 
-// 提取佣金弹窗
-const showWithdrawPopup = ref(false)
-const withdrawAmount = ref('')
+// 时间选择器显示状态
+const showTimePicker = ref(false)
 
-// 佣金数据
-const commissionItems = ref([
-  { label: '今日佣金', value: '1,240.00', icon: 'calendar' },
-  { label: '本月佣金', value: '15,680.00', icon: 'chart' },
-  { label: '累计佣金', value: '128,500.00', icon: 'star' },
-  { label: '可提取佣金', value: '8,500.00', icon: 'money' }
+// 时间选项
+const timeOptions = ref([
+  { label: '今日', value: 'today' },
+  { label: '昨日', value: 'yesterday' },
+  { label: '本周', value: 'thisWeek' },
+  { label: '上周', value: 'lastWeek' },
+  { label: '本月', value: 'thisMonth' },
+  { label: '上月', value: 'lastMonth' },
+  { label: '近7天', value: 'last7Days' },
+  { label: '近30天', value: 'last30Days' }
 ])
 
-// 佣金规则
-const commissionRules = ref([
-  { title: '新手代理', description: '佣金比例：5%，无门槛要求' },
-  { title: '铜牌代理', description: '佣金比例：8%，月业绩达到10万' },
-  { title: '银牌代理', description: '佣金比例：12%，月业绩达到50万' },
-  { title: '金牌代理', description: '佣金比例：15%，月业绩达到100万' }
+// 当前时间标签
+const currentTimeLabel = computed(() => {
+  const option = timeOptions.value.find(item => item.value === selectedTime.value)
+  return option ? option.label : '今日'
+})
+
+// 佣金记录数据
+const commissionRecords = ref([
+  // 暂时为空数组，显示空状态
+  // 实际使用时可以添加记录数据，例如：
+  // {
+  //   id: 1,
+  //   date: '2024-01-15',
+  //   amount: '1,240.00',
+  //   type: '投注佣金',
+  //   status: '已结算',
+  //   statusClass: 'settled',
+  //   description: '来自用户ABC123的投注佣金'
+  // }
 ])
-
-// 佣金记录
-const recentCommissionRecords = ref([
-  { id: 1, type: '投注佣金', amount: '1,240.00', time: '2024-01-15 14:30', icon: 'money', color: '#00b42a' },
-  { id: 2, type: '推广佣金', amount: '680.00', time: '2024-01-15 10:20', icon: 'user', color: '#165dff' },
-  { id: 3, type: '佣金提取', amount: '-5,000.00', time: '2024-01-14 16:45', icon: 'withdraw', color: '#f53f3f' },
-  { id: 4, type: '投注佣金', amount: '890.00', time: '2024-01-14 09:15', icon: 'money', color: '#00b42a' }
-])
-
-
 
 /**
- * 提取佣金
+ * 显示时间选择器
  */
-const withdrawCommission = () => {
-  showWithdrawPopup.value = true
+const showTimeSelector = () => {
+  showTimePicker.value = true
 }
 
 /**
- * 确认提取
+ * 关闭时间选择器
  */
-const confirmWithdraw = () => {
-  if (!withdrawAmount.value) {
-    toast.error('请输入提取金额')
-    return
-  }
-  
-  const amount = parseFloat(withdrawAmount.value)
-  const available = parseFloat(commissionItems.value[3].value.replace(',', ''))
-  
-  if (amount > available) {
-    toast.error('提取金额不能超过可提取金额')
-    return
-  }
-  
-  showWithdrawPopup.value = false
-  toast.loading('正在处理提取申请...')
-  
+const closeTimeSelector = () => {
+  showTimePicker.value = false
+}
+
+/**
+ * 选择时间
+ */
+const selectTime = (timeValue: string) => {
+  selectedTime.value = timeValue
+  showTimePicker.value = false
+  loadCommissionData(timeValue)
+}
+
+/**
+ * 加载佣金数据
+ */
+const loadCommissionData = (timeValue: string) => {
+  toast.loading('正在加载佣金数据...')
+
+  // 模拟数据加载
   setTimeout(() => {
-    toast.success('提取申请已提交，请等待审核')
-    withdrawAmount.value = ''
-  }, 2000)
-}
+    // 这里应该调用API获取对应时间段的佣金数据
+    // 暂时保持空状态
+    commissionRecords.value = []
 
-/**
- * 查看佣金历史
- */
-const viewCommissionHistory = () => {
-  uni.navigateTo({
-    url: '/pages/commission/history'
-  })
-}
-
-/**
- * 查看全部记录
- */
-const viewAllRecords = () => {
-  uni.navigateTo({
-    url: '/pages/commission/records'
-  })
-}
-
-/**
- * 管理银行卡
- */
-const manageBankCard = () => {
-  uni.navigateTo({
-    url: '/pages/account/bank-card'
-  })
-}
-
-/**
- * 绑定支付宝
- */
-const bindAlipay = () => {
-  uni.navigateTo({
-    url: '/pages/account/alipay'
-  })
-}
-
-/**
- * 管理微信
- */
-const manageWechat = () => {
-  uni.navigateTo({
-    url: '/pages/account/wechat'
-  })
+    toast.success('数据加载完成')
+  }, 1000)
 }
 </script>
 
@@ -263,78 +168,302 @@ const manageWechat = () => {
 .commission-page {
   background-color: #f5f7fa;
   min-height: 100vh;
-}
-
-.content {
-  padding: 20rpx;
-}
-
-.commission-overview-card,
-.commission-action-card,
-.commission-rules-card,
-.commission-stats-card,
-.commission-records-card,
-.withdraw-settings-card {
-  margin-bottom: 24rpx;
-}
-
-.commission-item {
-  text-align: center;
-  padding: 24rpx;
-  background-color: #ffffff;
-  border-radius: 12rpx;
-  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
-}
-
-.commission-value {
-  display: block;
-  font-size: 32rpx;
-  font-weight: 600;
-  color: #ff7d00;
-  margin: 8rpx 0;
-}
-
-.commission-label {
-  font-size: 24rpx;
-  color: #86909c;
-}
-
-.action-buttons {
-  padding: 20rpx 0;
-}
-
-.view-more {
-  text-align: center;
-  padding: 20rpx 0;
-}
-
-.withdraw-popup {
-  background-color: #ffffff;
-  border-radius: 24rpx 24rpx 0 0;
-  padding: 40rpx;
-}
-
-.popup-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 40rpx;
-}
-
-.popup-title {
-  font-size: 32rpx;
-  font-weight: 600;
-  color: #1d2129;
-}
-
-.popup-content {
   padding-bottom: 40rpx;
 }
 
-.available-amount {
-  display: block;
-  font-size: 24rpx;
-  color: #86909c;
-  margin-top: 16rpx;
+// 结算周期信息区域
+.settlement-info-section {
+  background-color: #ffffff;
+  padding: 32rpx;
+  margin-bottom: 24rpx;
+
+  .info-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .info-label {
+      font-size: 28rpx;
+      color: var(--text-primary, #1d2129);
+      font-weight: 500;
+    }
+
+    .info-value {
+      font-size: 28rpx;
+      color: var(--text-secondary, #86909c);
+    }
+  }
+}
+
+// 时间筛选区域
+.time-filter-section {
+  background-color: #ffffff;
+  padding: 32rpx;
+  margin-bottom: 24rpx;
+
+  .filter-dropdown {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 24rpx 32rpx;
+    background-color: #f7f8fa;
+    border-radius: 12rpx;
+    border: 1rpx solid var(--border-color, #e5e6eb);
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    &:active {
+      background-color: #f0f1f5;
+      transform: scale(0.98);
+    }
+
+    .filter-text {
+      font-size: 28rpx;
+      color: var(--text-primary, #1d2129);
+      font-weight: 500;
+    }
+  }
+}
+
+// 佣金记录区域
+.commission-records-section {
+  background-color: #ffffff;
+  margin: 0 24rpx;
+  border-radius: 16rpx;
+  min-height: 400rpx;
+
+  // 空状态
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 120rpx 40rpx;
+
+    .empty-icon {
+      width: 80rpx;
+      height: 80rpx;
+      border-radius: 50%;
+      background-color: #f7f8fa;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 32rpx;
+
+      .empty-dot {
+        font-size: 48rpx;
+        color: var(--text-secondary, #86909c);
+        font-weight: bold;
+        line-height: 1;
+      }
+    }
+
+    .empty-text {
+      font-size: 28rpx;
+      color: var(--text-secondary, #86909c);
+    }
+  }
+
+  // 记录列表
+  .records-list {
+    padding: 32rpx;
+
+    .record-item {
+      padding: 32rpx 0;
+      border-bottom: 1rpx solid var(--border-color, #e5e6eb);
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      .record-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16rpx;
+
+        .record-date {
+          font-size: 28rpx;
+          color: var(--text-primary, #1d2129);
+          font-weight: 500;
+        }
+
+        .record-amount {
+          font-size: 32rpx;
+          color: var(--primary-color, #165dff);
+          font-weight: 600;
+
+          &.negative {
+            color: #f53f3f;
+          }
+        }
+      }
+
+      .record-details {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12rpx;
+
+        .record-type {
+          font-size: 24rpx;
+          color: var(--text-secondary, #86909c);
+        }
+
+        .record-status {
+          font-size: 24rpx;
+          padding: 8rpx 16rpx;
+          border-radius: 8rpx;
+
+          &.settled {
+            color: #00b42a;
+            background-color: rgba(0, 180, 42, 0.1);
+          }
+
+          &.pending {
+            color: #ff7d00;
+            background-color: rgba(255, 125, 0, 0.1);
+          }
+
+          &.failed {
+            color: #f53f3f;
+            background-color: rgba(245, 63, 63, 0.1);
+          }
+
+          &.processing {
+            color: var(--primary-color, #165dff);
+            background-color: rgba(22, 93, 255, 0.1);
+          }
+        }
+      }
+
+      .record-description {
+        .description-text {
+          font-size: 22rpx;
+          color: var(--text-tertiary, #c9cdd4);
+          line-height: 1.4;
+        }
+      }
+    }
+  }
+}
+
+// 时间选择器弹窗
+.time-picker-popup {
+  background-color: #ffffff;
+  border-radius: 24rpx 24rpx 0 0;
+
+  .picker-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 32rpx;
+    border-bottom: 1rpx solid var(--border-color, #e5e6eb);
+
+    .picker-title {
+      font-size: 32rpx;
+      font-weight: 600;
+      color: var(--text-primary, #1d2129);
+    }
+  }
+
+  .picker-options {
+    padding: 24rpx 0;
+    max-height: 600rpx;
+    overflow-y: auto;
+
+    .picker-option {
+      padding: 24rpx 32rpx;
+      font-size: 28rpx;
+      color: var(--text-primary, #1d2129);
+      cursor: pointer;
+      transition: all 0.3s ease;
+
+      &:active {
+        background-color: #f7f8fa;
+      }
+
+      &.active {
+        color: var(--primary-color, #165dff);
+        background-color: rgba(22, 93, 255, 0.1);
+        font-weight: 600;
+      }
+    }
+  }
+}
+
+// 响应式适配
+@media (max-width: 750rpx) {
+  .settlement-info-section,
+  .time-filter-section {
+    padding: 24rpx;
+
+    .info-item {
+      .info-label,
+      .info-value {
+        font-size: 26rpx;
+      }
+    }
+
+    .filter-dropdown {
+      padding: 20rpx 24rpx;
+
+      .filter-text {
+        font-size: 26rpx;
+      }
+    }
+  }
+
+  .commission-records-section {
+    margin: 0 16rpx;
+
+    .empty-state {
+      padding: 80rpx 24rpx;
+
+      .empty-icon {
+        width: 60rpx;
+        height: 60rpx;
+
+        .empty-dot {
+          font-size: 36rpx;
+        }
+      }
+
+      .empty-text {
+        font-size: 26rpx;
+      }
+    }
+
+    .records-list {
+      padding: 24rpx;
+
+      .record-item {
+        padding: 24rpx 0;
+
+        .record-header {
+          .record-date {
+            font-size: 26rpx;
+          }
+
+          .record-amount {
+            font-size: 28rpx;
+          }
+        }
+
+        .record-details {
+          .record-type,
+          .record-status {
+            font-size: 22rpx;
+          }
+        }
+
+        .record-description {
+          .description-text {
+            font-size: 20rpx;
+          }
+        }
+      }
+    }
+  }
 }
 </style>
