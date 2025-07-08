@@ -2,18 +2,8 @@
 import { onLaunch, onShow, onHide } from "@dcloudio/uni-app";
 import { ref, onMounted } from "vue";
 import { getIndexData } from "@/utils/auth";
-import CustomLoading from "@/components/CustomLoading.vue";
-import { loadingState, showCustomLoading, hideCustomLoading } from "@/utils/request";
 
 const indexData = ref(getIndexData());
-
-// 测试自定义加载
-function testCustomLoading() {
-  showCustomLoading("测试中...");
-  setTimeout(() => {
-    hideCustomLoading();
-  }, 3000);
-}
 
 onLaunch(() => {
   console.log("App Launch");
@@ -38,19 +28,15 @@ onHide(() => {
   console.log("App Hide");
 });
 
-onMounted(() => {
-  console.log("App Mounted");
-  console.log("加载状态组件初始状态:", JSON.stringify(loadingState.value));
-
-  // 延迟1秒后测试加载状态
-  setTimeout(testCustomLoading, 1000);
-});
+onMounted(() => {});
 </script>
 
 <template>
   <view>
-    <!-- 自定义加载组件 -->
-    <CustomLoading />
+    <!-- 全局注册wot-design-uni的组件 -->
+    <wd-message-box />
+    <wd-toast />
+    <wd-loading />
   </view>
 </template>
 

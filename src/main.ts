@@ -4,6 +4,7 @@ import App from "./App.vue";
 import setupPlugins from "@/plugins";
 import progressiveBackground from "@/directives/progressiveBackground";
 import lazyLoadMixin from "@/mixins/lazyLoadMixin";
+// 注意: wot-design-uni 没有默认导出，需要单独导入组件
 
 import "uno.css";
 import "@/styles/global.scss";

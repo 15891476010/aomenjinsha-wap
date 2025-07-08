@@ -119,6 +119,7 @@
       <view>2. 参与USDT/电子钱包充值专属优惠，乐享优越金融体验！</view>
     </view>
     <wd-toast />
+    <wd-message-box />
   </view>
   <view class="h-70px" />
   <TabbarCom />
@@ -126,12 +127,15 @@
 
 <script setup lang="ts">
 import { onMounted, ref, computed, watch } from "vue";
-import TabbarCom from "@/components/Tabbar";
+import TabbarCom from "@/components/Tabbar/index.vue";
 import { useUserStore } from "@/store/modules/user";
 import RechargeApi from "@/api/recharge";
 import { getIndexData } from "@/utils/auth";
 import { useRechargeStore } from "@/store";
+import { useMessage } from "wot-design-uni";
+
 const indexData = ref(getIndexData());
+const message = useMessage();
 
 const userStore = useUserStore();
 const userInfo = computed(() => userStore.userInfo);
@@ -158,6 +162,39 @@ const currentSeconds = computed(() => {
   if (!currentChannels.value.length) return [];
   return currentChannels.value[activeChannel.value]?.second || [];
 });
+
+// 监听是否需要显示刷新确认框
+watch(
+  () => rechargeStore.needRefreshConfirm,
+  (newVal) => {
+    if (newVal) {
+      // 显示确认框
+      message
+        .confirm({
+          title: "提示",
+          msg: "页面已更新，是否刷新页面？",
+        })
+        .then(() => {
+          // 用户点击确定，更新数据
+          if (rechargeStore.updateDataAndRefresh()) {
+            // 刷新页面
+            const currentPage = getCurrentPages()[getCurrentPages().length - 1];
+            if (currentPage && currentPage.route) {
+              uni.reLaunch({
+                url: "/" + currentPage.route,
+              });
+            }
+          }
+        })
+        .catch(() => {
+          // 用户点击取消
+          rechargeStore.cancelUpdate();
+          console.log("用户取消刷新页面");
+        });
+    }
+  },
+  { immediate: true }
+);
 
 watch(customAmount, (newVal) => {
   if (currentSeconds.value[activeSecond.value].currency === "USD") {
