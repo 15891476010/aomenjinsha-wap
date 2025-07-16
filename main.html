@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>澳门金沙集团 - 网站维护中</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        box-sizing: border-box;
+        padding: 0;
+        margin: 0;
+      }
+
+      html,
+      body {
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
+
+      body {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        overflow: hidden;
+        font-family: "Poppins", sans-serif;
+        color: #ffffff;
+        background: linear-gradient(135deg, #000428, #004e92);
+      }
+
+      .overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 1;
+        width: 100%;
+        height: 100%;
+        background: url("https://images.unsplash.com/photo-1519681393784-d120267933ba?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80")
+          center center;
+        background-size: cover;
+        opacity: 0.2;
+      }
+
+      .blur-container {
+        position: absolute;
+        z-index: 2;
+        width: 100%;
+        height: 100%;
+        backdrop-filter: blur(8px);
+      }
+
+      .content {
+        position: relative;
+        z-index: 3;
+        max-width: 800px;
+        padding: 2rem;
+        text-align: center;
+        background: rgba(0, 0, 0, 0.4);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 20px;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      }
+
+      .logo {
+        margin-bottom: 2rem;
+      }
+
+      .logo img {
+        height: 80px;
+      }
+
+      h1 {
+        margin-bottom: 1.5rem;
+        font-size: 3rem;
+        font-weight: 600;
+        text-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        background: linear-gradient(90deg, #f8bf96, #ffdf70);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      p {
+        margin-bottom: 2rem;
+        font-size: 1.2rem;
+        line-height: 1.8;
+        color: rgba(255, 255, 255, 0.8);
+      }
+
+      .countdown {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin: 2rem 0;
+      }
+
+      .countdown-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-width: 100px;
+      }
+
+      .countdown-value {
+        min-width: 80px;
+        padding: 0.5rem;
+        font-size: 2.5rem;
+        font-weight: 600;
+        color: #ffffff;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+      }
+
+      .countdown-label {
+        margin-top: 0.5rem;
+        font-size: 0.9rem;
+        color: rgba(255, 255, 255, 0.7);
+      }
+
+      .compensation {
+        padding: 1rem;
+        margin-top: 2rem;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+      }
+
+      .decoration {
+        position: absolute;
+        z-index: 1;
+        background: radial-gradient(
+          circle,
+          rgba(255, 255, 255, 0.1) 0%,
+          rgba(255, 255, 255, 0) 70%
+        );
+        border-radius: 50%;
+      }
+
+      .decoration-1 {
+        top: -150px;
+        left: -150px;
+        width: 300px;
+        height: 300px;
+      }
+
+      .decoration-2 {
+        right: -200px;
+        bottom: -200px;
+        width: 400px;
+        height: 400px;
+      }
+
+      @media (max-width: 768px) {
+        h1 {
+          font-size: 2rem;
+        }
+
+        p {
+          font-size: 1rem;
+        }
+
+        .countdown {
+          flex-wrap: wrap;
+        }
+
+        .countdown-item {
+          min-width: 70px;
+        }
+
+        .countdown-value {
+          min-width: 60px;
+          font-size: 2rem;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .content {
+          padding: 1.5rem;
+        }
+
+        h1 {
+          font-size: 1.8rem;
+        }
+
+        .countdown-item {
+          min-width: 60px;
+        }
+
+        .countdown-value {
+          min-width: 50px;
+          font-size: 1.6rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="overlay"></div>
+    <div class="blur-container"></div>
+
+    <div class="decoration decoration-1"></div>
+    <div class="decoration decoration-2"></div>
+
+    <div class="content">
+      <div class="logo">
+        <!-- 可以替换为实际的金沙集团logo -->
+        <h1>澳门金沙集团</h1>
+      </div>
+
+      <h1>网站维护中</h1>
+      <p>
+        尊敬的用户，我们的网站正在进行系统升级和维护，以便为您提供更好的服务体验。我们预计将于以下时间恢复正常运营：
+      </p>
+
+      <div class="countdown">
+        <div class="countdown-item">
+          <div class="countdown-value" id="days">00</div>
+          <div class="countdown-label">天</div>
+        </div>
+        <div class="countdown-item">
+          <div class="countdown-value" id="hours">00</div>
+          <div class="countdown-label">时</div>
+        </div>
+        <div class="countdown-item">
+          <div class="countdown-value" id="minutes">00</div>
+          <div class="countdown-label">分</div>
+        </div>
+        <div class="countdown-item">
+          <div class="countdown-value" id="seconds">00</div>
+          <div class="countdown-label">秒</div>
+        </div>
+      </div>
+
+      <div class="compensation">
+        <p>感谢您的耐心等待，系统恢复后我们将向所有受影响用户提供相应补偿。</p>
+      </div>
+    </div>
+
+    <script>
+      // 设置倒计时结束日期 - 2024年7月22日00:00:00（美东时间）
+      function getETEndDate() {
+        // 创建2024年7月22日00:00:00 美东时间
+        // 注意：月份是从0开始的，所以7月是6
+        const targetDate = new Date(Date.UTC(2025, 6, 22, 4, 0, 0));
+        // 美东时间比UTC慢4小时(夏令时)或5小时(冬令时)
+        // 这里使用UTC时间4:00，对应美东时间0:00
+        return targetDate;
+      }
+
+      const endDate = getETEndDate();
+
+      // 更新倒计时
+      function updateCountdown() {
+        const now = new Date();
+        const diff = endDate - now;
+
+        if (diff <= 0) {
+          document.getElementById("days").innerText = "00";
+          document.getElementById("hours").innerText = "00";
+          document.getElementById("minutes").innerText = "00";
+          document.getElementById("seconds").innerText = "00";
+          return;
+        }
+
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+        document.getElementById("days").innerText = days.toString().padStart(2, "0");
+        document.getElementById("hours").innerText = hours.toString().padStart(2, "0");
+        document.getElementById("minutes").innerText = minutes.toString().padStart(2, "0");
+        document.getElementById("seconds").innerText = seconds.toString().padStart(2, "0");
+      }
+
+      // 初始化倒计时
+      updateCountdown();
+
+      // 每秒更新一次倒计时
+      setInterval(updateCountdown, 1000);
+
+      // 添加视差效果
+      document.addEventListener("mousemove", function (e) {
+        const moveX = (e.clientX - window.innerWidth / 2) * 0.01;
+        const moveY = (e.clientY - window.innerHeight / 2) * 0.01;
+
+        document.querySelector(".content").style.transform = `translate(${moveX}px, ${moveY}px)`;
+      });
+    </script>
+  </body>
+</html>

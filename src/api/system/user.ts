@@ -170,6 +170,9 @@ export interface UserInfo {
 
   /** 余额 */
   balance?: number;
+
+  /** 会员等级 */
+  vipLevel?: number;
 }
 
 /**

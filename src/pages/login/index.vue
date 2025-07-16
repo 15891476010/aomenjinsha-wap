@@ -364,9 +364,10 @@ const handleLogin = () => {
       // #endif
 
       // 登录成功后跳转
-      uni.reLaunch({
-        url: redirect.value,
-      });
+      // uni.reLaunch({
+      //   url: redirect.value,
+      // });
+      uni.navigateBack();
     })
     .catch((error) => {
       toast.error(error?.message || "登录失败");

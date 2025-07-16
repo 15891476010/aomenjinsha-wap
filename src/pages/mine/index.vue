@@ -62,7 +62,7 @@
       <view class="vip-left">
         <wd-tag custom-class="vip-tag" type="danger">
           VIP
-          <text>0</text>
+          <text>{{ userInfo?.vipLevel || 0 }}</text>
         </wd-tag>
       </view>
       <view class="vip-right">
